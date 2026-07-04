@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Neuro Diagnosis</title>
+    <meta name="description" content="System administrator dashboard for Neuro Diagnosis">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/custom-style.css">
+
+    <style>
+        /* Admin Theme styling - Green sync */
+        .admin-nav {
+            background: linear-gradient(135deg, #7BB661 0%, #6BA055 100%);
+        }
+
+        .admin-nav .navbar-brand,
+        .admin-nav .navbar-brand span,
+        .admin-nav .navbar-nav .nav-link,
+        .admin-nav .navbar-nav .nav-link.active {
+            color: white !important;
+        }
+
+        .admin-nav .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            color: white !important;
+        }
+
+        .admin-nav .btn-outline-light:hover {
+            background-color: white !important;
+            color: #7BB661 !important;
+        }
+
+        .admin-primary-text {
+            color: #7BB661;
+        }
+        
+        .admin-card-header {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #7BB661;
+        }
+
+        .btn-primary {
+            background-color: #7BB661 !important;
+            border-color: #7BB661 !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #6BA055 !important;
+            border-color: #6BA055 !important;
+        }
+
+        .text-primary {
+            color: #7BB661 !important;
+        }
+
+        .bg-primary {
+            background-color: #7BB661 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top admin-nav py-1">
+        <div class="container-fluid px-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="admin-dashboard.html">
+                <i class="bi bi-shield-lock-fill fs-3 me-2" style="color: white;"></i>
+                <div>
+                    <span class="fw-bold fs-5 d-block" style="color: white; line-height: 1.2;">Neuro Diagnosis</span>
+                    <small style="font-size: 0.65rem; opacity: 0.9; color: white;">Admin Portal Management</small>
+                </div>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="#" onclick="showSection('overview')">
+                            <i class="bi bi-speedometer2 me-1"></i>Overview
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('users')">
+                            <i class="bi bi-people me-1"></i>User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('cases')">
+                            <i class="bi bi-folder2-open me-1"></i>Case Assignment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('settings')">
+                            <i class="bi bi-gear me-1"></i>Settings
+                        </a>
+                    </li>
+                    <!-- Notification Bell -->
+                    <li class="nav-item dropdown ms-lg-3">
+                        <a class="nav-link notification-bell-wrapper" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsRead(getUserSession().userData.email); updateNotificationUI();">
+                            <i class="bi bi-bell fs-5" style="color: white;"></i>
+                            <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end nd-notification-dropdown" aria-labelledby="notificationDropdown" id="notificationList">
+                            <li class="dropdown-header">Notifications</li>
+                            <li><span class="dropdown-item text-muted small py-3">No new notifications</span></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Inline script to ensure notification UI updates on load
+        window.addEventListener('load', () => {
+            if (typeof updateNotificationUI === 'function') {
+                updateNotificationUI();
+            }
+        });
+    </script>
+
+    <!-- Main Content -->
+    <div class="dashboard-content pb-5">
+        <div class="container-fluid px-4">
+            
+            <!-- Header section -->
+            <div class="dashboard-header mt-4 mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="h3 mb-2 fw-bold" style="color: #7BB661;">
+                            <i class="bi bi-shield-check me-2"></i>Admin Control Center
+                        </h1>
+                        <p class="text-muted mb-0">Manage users, assignments, and platform monitoring.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= OVERVIEW SECTION ================= -->
+            <div id="section-overview" class="admin-section">
+                <!-- System Stats - 8 Cards -->
+                <div class="row g-4 mb-4">
+                    
+                    <!-- Card 1: Total Users -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-primary">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Total Users</p>
+                                <h2 class="display-6 fw-bold mb-0 text-primary" id="statTotalUsers">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Total Patients -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-secondary">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Total Patients</p>
+                                <h2 class="display-6 fw-bold mb-0 text-secondary" id="statTotalPatients">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Total Doctors -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-info">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Total Doctors</p>
+                                <h2 class="display-6 fw-bold mb-0 text-info" id="statTotalDoctors">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Total Scans -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4" style="border-color: #7BB661 !important;">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Total Scans</p>
+                                <h2 class="display-6 fw-bold mb-0" style="color: #7BB661;" id="statTotalScans">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Pending Reviews -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-warning">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Pending Reviews</p>
+                                <h2 class="display-6 fw-bold mb-0 text-warning" id="statPendingReviews">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Reviewed Scans -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-success">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Reviewed Scans</p>
+                                <h2 class="display-6 fw-bold mb-0 text-success" id="statReviewedScans">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 7: Tumor Detected -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-danger">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">Tumor Detected</p>
+                                <h2 class="display-6 fw-bold mb-0 text-danger" id="statTumorDetected">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 8: No Tumor -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card shadow-sm border-0 h-100 border-start border-4 border-success">
+                            <div class="card-body">
+                                <p class="text-muted mb-1 small fw-bold text-uppercase">No Tumor</p>
+                                <h2 class="display-6 fw-bold mb-0 text-success" id="statNoTumor">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= USER MANAGEMENT SECTION ================= -->
+            <div id="section-users" class="admin-section" style="display: none;">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center p-3">
+                        <h5 class="mb-0 fw-bold admin-primary-text"><i class="bi bi-person-lines-fill me-2"></i>User Management</h5>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                            <i class="bi bi-plus-circle me-1"></i>Create User
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Filters -->
+                        <div class="p-3 bg-light border-bottom d-flex gap-2">
+                            <select class="form-select form-select-sm w-auto">
+                                <option value="all">All Roles</option>
+                                <option value="doctor">Doctors</option>
+                                <option value="radiologist">Radiologists</option>
+                                <option value="patient">Patients</option>
+                            </select>
+                            <input type="text" class="form-control form-control-sm" placeholder="Search by name or email..." style="max-width: 300px;">
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Dynamic User Rows -->
+                                </tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= CASE ASSIGNMENT SECTION ================= -->
+            <div id="section-cases" class="admin-section" style="display: none;">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center p-3">
+                        <h5 class="mb-0 fw-bold admin-primary-text"><i class="bi bi-clipboard2-pulse me-2"></i>Global Case Oversight</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="alert alert-warning m-3 d-flex align-items-center shadow-sm">
+                            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>System Note:</strong> Administrators have global read-only access to case statuses for operational routing. 
+                                Clinical viewing and annotations are strictly disabled at this permission level.
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Case ID</th>
+                                        <th>Patient</th>
+                                        <th>Upload Date</th>
+                                        <th>AI Prediction</th>
+                                        <th>Assigned Provider</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Management</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="casesTableBody">
+                                    <!-- Dynamic Case Rows -->
+                                </tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SYSTEM SETTINGS SECTION ================= -->
+            <div id="section-settings" class="admin-section" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header admin-card-header p-3">
+                                <h5 class="mb-0 fw-bold admin-primary-text"><i class="bi bi-gear-fill me-2"></i>System Configuration</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Active AI Model</label>
+                                    <select class="form-select" id="aiModelSelect" onchange="saveSettings()">
+                                        <option value="resnet50">ResNet50 (Default)</option>
+                                        <option value="mobilenetv2">MobileNetV2-based model</option>
+                                        <option value="custom">Custom Experimental</option>
+                                    </select>
+                                    <div class="form-text">Select the neural network architecture used for scanning.</div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="debugModeToggle" onchange="saveSettings()">
+                                        <label class="form-check-label fw-bold" for="debugModeToggle">Enable Debug Mode</label>
+                                    </div>
+                                    <div class="form-text">Displays extra technical metadata across the dashboard for troubleshooting.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header admin-card-header p-3">
+                                <h5 class="mb-0 fw-bold admin-primary-text"><i class="bi bi-database-down me-2"></i>Data Export</h5>
+                            </div>
+                            <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                                <i class="bi bi-file-earmark-spreadsheet text-muted mb-3" style="font-size: 3rem;"></i>
+                                <p class="text-muted mb-4">Export a complete CSV log of all scans, including assignments, predictions, and clinical statuses.</p>
+                                <div>
+                                    <button class="btn btn-primary px-4" onclick="downloadScanLog()">
+                                        <i class="bi bi-download me-2"></i>Download Scan Log
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary">Create System User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="createUserName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="createUserEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select id="createUserRole" class="form-select">
+                                <option value="doctor">Doctor</option>
+                                <option value="radiologist">Radiologist</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">License / ID Number</label>
+                            <input type="text" id="createUserLicense" class="form-control" placeholder="Optional for some roles">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNewUser()">Create User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary">Edit System User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="editUserName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="editUserEmail" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select id="editUserRole" class="form-select">
+                                <option value="doctor">Doctor</option>
+                                <option value="radiologist">Radiologist</option>
+                                <option value="admin">Administrator</option>
+                                <option value="patient">Patient</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUserEdit()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Logs Modal -->
+    <div class="modal fade" id="viewLogsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-file-text me-2"></i>Scan Metadata Logs</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light" id="logsModalBody" style="font-family: monospace; font-size: 0.9rem;">
+                    <!-- Logs populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+    <!-- Admin Dashboard Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const session = getUserSession();
+            
+            // Uncomment in production
+            /*
+            if (!session.userType || session.userType !== 'admin') {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            */
+            
+            loadSettings();
+            renderAdminDashboard();
+        });
+
+        // ==========================================
+        // Data Access Helpers
+        // ==========================================
+        function loadUsers() {
+            let users = JSON.parse(localStorage.getItem('systemUsers'));
+            if (!users || users.length === 0) {
+                users = [
+                    { id: 'DR-1045', name: 'Dr. Sarah Johnson', email: 'sarah.j@hospital.com', role: 'doctor', status: 'active' },
+                    { id: 'RAD-802', name: 'Dr. Michael Chen', email: 'm.chen@hospital.com', role: 'radiologist', status: 'active' },
+                    { id: 'PT-DEMO', name: 'Demo Patient', email: 'patient@demo.com', role: 'patient', status: 'active' }
+                ];
+                saveUsers(users);
+            }
+            
+            // Sync with pendingScans
+            const scans = loadScans();
+            const existingEmails = new Set(users.map(u => u.email));
+            let updated = false;
+            
+            scans.forEach(scan => {
+                if (scan.patientEmail && !existingEmails.has(scan.patientEmail)) {
+                    users.push({
+                        id: 'PT-' + scan.scanId.substring(0, 6),
+                        name: scan.patientName || 'Unknown Patient',
+                        email: scan.patientEmail,
+                        role: 'patient',
+                        status: 'active'
+                    });
+                    existingEmails.add(scan.patientEmail);
+                    updated = true;
+                }
+            });
+            
+            if (updated) saveUsers(users);
+            return users;
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('systemUsers', JSON.stringify(users));
+        }
+
+        function loadScans() {
+            return JSON.parse(localStorage.getItem('pendingScans') || '[]');
+        }
+
+        function saveScans(scans) {
+            safeSavePendingScans(scans);
+        }
+        
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('adminSettings') || '{"aiModel": "resnet50", "debugMode": false}');
+            document.getElementById('aiModelSelect').value = settings.aiModel;
+            document.getElementById('debugModeToggle').checked = settings.debugMode;
+            return settings;
+        }
+
+        function saveSettings() {
+            const aiModel = document.getElementById('aiModelSelect').value;
+            const debugMode = document.getElementById('debugModeToggle').checked;
+            localStorage.setItem('adminSettings', JSON.stringify({ aiModel, debugMode }));
+            showAlert('System settings saved.', 'success');
+            renderAdminDashboard(); // Re-render in case debug mode toggles UI
+        }
+
+        // ==========================================
+        // Render Functions
+        // ==========================================
+        function renderAdminDashboard() {
+            const users = loadUsers();
+            const scans = loadScans();
+            
+            renderOverview(users, scans);
+            renderUsers(users);
+            renderScans(scans, users);
+        }
+
+        function renderOverview(users, scans) {
+            const totalPatients = users.filter(u => u.role === 'patient').length;
+            const totalDoctors = users.filter(u => u.role === 'doctor' || u.role === 'radiologist').length;
+            const pendingReviews = scans.filter(s => s.status !== 'reviewed').length;
+            const reviewedScans = scans.filter(s => s.status === 'reviewed').length;
+            
+            let tumorDetected = 0;
+            let noTumor = 0;
+            scans.forEach(s => {
+                if(s.predictedClass && s.predictedClass !== 'notumor' && s.predictedClass !== 'no_tumor') tumorDetected++;
+                else if (s.predictedClass) noTumor++;
+            });
+
+            document.getElementById('statTotalUsers').textContent = users.length;
+            document.getElementById('statTotalPatients').textContent = totalPatients;
+            document.getElementById('statTotalDoctors').textContent = totalDoctors;
+            document.getElementById('statTotalScans').textContent = scans.length;
+            document.getElementById('statPendingReviews').textContent = pendingReviews;
+            document.getElementById('statReviewedScans').textContent = reviewedScans;
+            document.getElementById('statTumorDetected').textContent = tumorDetected;
+            document.getElementById('statNoTumor').textContent = noTumor;
+        }
+
+        function renderUsers(users) {
+            const usersTbody = document.getElementById('usersTableBody');
+            usersTbody.innerHTML = '';
+            
+            users.forEach(user => {
+                let roleBadge = '';
+                if (user.role === 'doctor') roleBadge = '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary">Doctor</span>';
+                else if (user.role === 'radiologist') roleBadge = '<span class="badge bg-info bg-opacity-10 text-info border border-info">Radiologist</span>';
+                else roleBadge = '<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Patient</span>';
+                
+                const isActive = user.status === 'active';
+                const statusBadge = isActive 
+                    ? '<span class="badge bg-success">Active</span>' 
+                    : '<span class="badge bg-danger">Deactivated</span>';
+                
+                const toggleIcon = isActive ? 'bi-slash-circle' : 'bi-check-circle';
+                const toggleBtnClass = isActive ? 'btn-outline-danger' : 'btn-outline-success';
+
+                usersTbody.innerHTML += `
+                    <tr>
+                        <td><strong>${user.id}</strong></td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${roleBadge}</td>
+                        <td>${statusBadge}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary me-1" onclick="openEditUser('${user.id}')"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm ${toggleBtnClass}" onclick="toggleUserStatus('${user.id}')" title="Toggle Status"><i class="bi ${toggleIcon}"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderScans(scans, users) {
+            const casesTbody = document.getElementById('casesTableBody');
+            casesTbody.innerHTML = '';
+            const doctors = users.filter(u => u.role === 'doctor' || u.role === 'radiologist');
+            
+            if (scans.length === 0) {
+                casesTbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No cases found in the system.</td></tr>';
+                return;
+            }
+
+            scans.forEach(scan => {
+                const uploadDate = new Date(scan.uploadDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const isTumor = scan.predictedClass && scan.predictedClass !== 'notumor' && scan.predictedClass !== 'no_tumor';
+                const aiPredictionHtml = isTumor 
+                    ? '<span class="text-danger fw-bold">Anomaly Detected</span>'
+                    : '<span class="text-success">No Anomaly</span>';
+                    
+                const isReviewed = scan.status === 'reviewed';
+                let statusBadgeHtml = '';
+                if(isReviewed) {
+                    statusBadgeHtml = '<span class="badge bg-success">Reviewed</span>';
+                } else if(scan.assignedDoctor) {
+                    statusBadgeHtml = '<span class="badge bg-info">Awaiting Review</span>';
+                } else {
+                    statusBadgeHtml = '<span class="badge bg-warning text-dark">Uploaded</span>';
+                }
+
+                let doctorOptions = '<option value="unassigned" ' + (!scan.assignedDoctor ? 'selected' : '') + '>Unassigned</option>';
+                doctors.forEach(doc => {
+                    const isSelected = scan.assignedDoctor === doc.email ? 'selected' : '';
+                    doctorOptions += `<option value="${doc.email}" ${isSelected}>${doc.name} (${doc.id})</option>`;
+                });
+
+                casesTbody.innerHTML += `
+                    <tr>
+                        <td><strong>${scan.scanId.substring(0,8)}</strong></td>
+                        <td>${scan.patientName} <br><small class="text-muted">${scan.patientEmail}</small></td>
+                        <td>${uploadDate}</td>
+                        <td>${aiPredictionHtml}</td>
+                        <td>
+                            <select class="form-select form-select-sm case-assign-select" data-scanid="${scan.scanId}" style="width: 150px;">
+                                ${doctorOptions}
+                            </select>
+                        </td>
+                        <td>${statusBadgeHtml}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm ${scan.assignedDoctor ? 'btn-outline-primary' : 'btn-primary'} mb-1" onclick="mapCase(this, '${scan.scanId}')" title="Update Assignment">
+                                <i class="bi bi-link-45deg"></i> Update
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary mb-1" onclick="viewScanLogs('${scan.scanId}')">
+                                <i class="bi bi-file-text"></i> Logs
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ==========================================
+        // Actions & Event Handlers
+        // ==========================================
+        function showSection(sectionName) {
+            document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
+            document.getElementById('section-' + sectionName).style.display = 'block';
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(el => el.classList.remove('active'));
+            event.target.closest('.nav-link').classList.add('active');
+        }
+
+        function submitNewUser() {
+            const name = document.getElementById('createUserName').value;
+            const email = document.getElementById('createUserEmail').value;
+            const role = document.getElementById('createUserRole').value;
+            const license = document.getElementById('createUserLicense').value;
+
+            if(!name || !email) {
+                showAlert('Name and Email are required.', 'danger');
+                return;
+            }
+
+            let users = loadUsers();
+            let prefix = role === 'patient' ? 'PT' : (role === 'doctor' ? 'DR' : 'RAD');
+            let id = prefix + '-' + Math.floor(Math.random() * 10000);
+            
+            users.push({ id, name, email, role, license, status: 'active' });
+            saveUsers(users);
+            
+            showAlert('User created successfully.', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createUserModal'));
+            modal.hide();
+            document.getElementById('createUserForm').reset();
+            renderAdminDashboard();
+        }
+
+        function toggleUserStatus(userId) {
+            let users = loadUsers();
+            let user = users.find(u => u.id === userId);
+            if(user) {
+                user.status = user.status === 'active' ? 'deactivated' : 'active';
+                saveUsers(users);
+                showAlert(`User ${user.name} is now ${user.status}.`, 'info');
+                renderAdminDashboard();
+            }
+        }
+
+        function openEditUser(userId) {
+            let users = loadUsers();
+            let user = users.find(u => u.id === userId);
+            if(user) {
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editUserName').value = user.name;
+                document.getElementById('editUserEmail').value = user.email;
+                document.getElementById('editUserRole').value = user.role;
+                
+                const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editModal.show();
+            }
+        }
+
+        function saveUserEdit() {
+            const id = document.getElementById('editUserId').value;
+            const name = document.getElementById('editUserName').value;
+            const email = document.getElementById('editUserEmail').value;
+            const role = document.getElementById('editUserRole').value;
+
+            let users = loadUsers();
+            let index = users.findIndex(u => u.id === id);
+            if(index !== -1) {
+                users[index].name = name;
+                users[index].email = email;
+                users[index].role = role;
+                saveUsers(users);
+                showAlert('User updated successfully.', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                modal.hide();
+                renderAdminDashboard();
+            }
+        }
+
+        function mapCase(btn, scanId) {
+            const row = btn.closest('tr');
+            const select = row.querySelector('.case-assign-select');
+            const doctorEmail = select.value;
+            const patientName = row.querySelector('td:nth-child(2)').textContent.trim().split('\n')[0].trim();
+
+            if (doctorEmail === 'unassigned') {
+                showAlert('Please select a doctor to map this case.', 'warning');
+                return;
+            }
+
+            let scans = loadScans();
+            const scanIndex = scans.findIndex(s => s.scanId === scanId);
+            if (scanIndex !== -1) {
+                scans[scanIndex].assignedDoctor = doctorEmail;
+                saveScans(scans);
+            }
+            
+            addNotification(
+                doctorEmail, 
+                `High Priority: New case ${scanId.substring(0,8)} assigned for patient ${patientName}`, 
+                'info'
+            );
+
+            showAlert('Case ' + scanId.substring(0,8) + ' successfully mapped.', 'success');
+            renderAdminDashboard();
+        }
+
+        function viewScanLogs(scanId) {
+            const scans = loadScans();
+            const scan = scans.find(s => s.scanId === scanId);
+            if(!scan) return;
+            
+            const settings = JSON.parse(localStorage.getItem('adminSettings') || '{"debugMode": false}');
+            
+            let logHtml = `
+                <div class="mb-2"><strong>Scan ID:</strong> ${scan.scanId}</div>
+                <div class="mb-2"><strong>Upload Date:</strong> ${new Date(scan.uploadDate).toLocaleString()}</div>
+                <div class="mb-2"><strong>Patient Name:</strong> ${scan.patientName}</div>
+                <div class="mb-2"><strong>Patient Email:</strong> ${scan.patientEmail}</div>
+                <div class="mb-2"><strong>Current Status:</strong> ${scan.status}</div>
+                <div class="mb-2"><strong>Assigned To:</strong> ${scan.assignedDoctor || 'Unassigned'}</div>
+                <div class="mb-2"><strong>AI Class:</strong> ${scan.predictedClass || 'N/A'}</div>
+            `;
+            
+            if(settings.debugMode) {
+                logHtml += `
+                    <hr>
+                    <div class="text-danger fw-bold mb-2">DEBUG METADATA</div>
+                    <div class="mb-1"><strong>Image Base64 Snippet:</strong> ${scan.imagePath ? scan.imagePath.substring(0,40)+'...' : 'N/A'}</div>
+                    <div class="mb-1"><strong>Confidence Score:</strong> ${scan.confidence ? (scan.confidence*100).toFixed(2)+'%' : 'N/A'}</div>
+                    <div class="mb-1"><strong>GradCAM Generated:</strong> ${scan.gradcamPath ? 'Yes' : 'No'}</div>
+                    <div class="mb-1"><strong>Probabilities:</strong> ${scan.probabilities ? JSON.stringify(scan.probabilities) : 'N/A'}</div>
+                `;
+            }
+
+            document.getElementById('logsModalBody').innerHTML = logHtml;
+            const modal = new bootstrap.Modal(document.getElementById('viewLogsModal'));
+            modal.show();
+        }
+
+        function downloadScanLog() {
+            const scans = loadScans();
+            
+            if(scans.length === 0) {
+                showAlert('No scans available to export.', 'warning');
+                return;
+            }
+
+            let csv = 'Scan ID,Patient Name,Doctor Email,Status,AI Prediction,Upload Date\n';
+            scans.forEach(s => {
+                csv += `"${s.scanId}","${s.patientName}","${s.assignedDoctor || 'Unassigned'}","${s.status}","${s.predictedClass}","${s.uploadDate}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'system_scans_log.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showAlert('Scan log downloaded successfully.', 'success');
+        }
+    </script>
+</body>
+</html>

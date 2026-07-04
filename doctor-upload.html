@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Patient Scan - Neuro Diagnosis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="text-center mb-4">
+                        <a href="doctor-dashboard.html" class="text-decoration-none text-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+
+                    <div class="login-card">
+                        <div class="login-header">
+                            <i class="bi bi-cloud-upload-fill"></i>
+                            <h1 class="h3 mb-2">Neuro Diagnosis</h1>
+                            <p class="mb-0">Doctor Upload Portal</p>
+                        </div>
+
+                        <div class="login-body">
+                            <h2 class="h4 text-center mb-4 text-primary fw-bold">Upload Patient MRI Scan</h2>
+
+                            <form id="doctorUploadForm">
+                                <div class="mb-3">
+                                    <label for="patientName" class="form-label">
+                                        <i class="bi bi-person me-2"></i>Patient Name *
+                                    </label>
+                                    <input type="text" class="form-control form-control-lg" id="patientName"
+                                        placeholder="Enter patient full name" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mriScan" class="form-label">
+                                        <i class="bi bi-file-earmark-medical me-2"></i>Upload MRI Scan *
+                                    </label>
+                                    <input type="file" class="form-control form-control-lg" id="mriScan"
+                                        accept=".jpg,.jpeg,.png" required>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Accepted formats: JPG, PNG (Max 10MB)
+                                    </div>
+
+                                    <div id="imagePreviewContainer" class="mt-3 d-none">
+                                        <p class="small fw-semibold mb-2">Preview:</p>
+                                        <img id="imagePreview" src="" alt="MRI Preview" class="img-fluid rounded"
+                                            style="max-height: 200px;">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                    <i class="bi bi-cpu me-2"></i>Upload & Analyze
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="text-center p-3 bg-light border-top">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Scan will be processed and added to review queue
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/ui-feedback.js"></script>
+
+    <script>
+        const form = document.getElementById('doctorUploadForm');
+        const mriInput = document.getElementById('mriScan');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        // Preview uploaded MRI scan
+        mriInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const validation = validateUploadedFile(file);
+                if (!validation.isValid) {
+                    showAlert(validation.message, 'error');
+                    mriInput.value = '';
+                    imagePreviewContainer.classList.add('d-none');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('d-none');
+                    
+                    // Compress preview image to stay within local/session storage quota
+                    compressImage(e.target.result, 800, 0.7)
+                        .then(compressed => {
+                            sessionStorage.setItem('doctorUploadedImage', compressed);
+                        })
+                        .catch(err => {
+                            console.warn('Failed to compress preview image, using original:', err);
+                            sessionStorage.setItem('doctorUploadedImage', e.target.result);
+                        });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission - UPDATED TO SEND TO FLASK BACKEND
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log('=== DOCTOR UPLOAD STARTED ===');
+
+            const patientName = document.getElementById('patientName').value;
+            const mriFile = mriInput.files[0];
+
+            if (!mriFile) {
+                showAlert('Please upload an MRI scan', 'error');
+                return;
+            }
+
+            const validation = validateUploadedFile(mriFile);
+            if (!validation.isValid) {
+                showAlert(validation.message, 'error');
+                return;
+            }
+
+            showLoading('Uploading and analyzing MRI scan...');
+
+            // ===== CHANGE 1: CREATE FormData WITH 'image' FIELD =====
+            const formData = new FormData();
+            formData.append('image', mriFile);  // Send file to Flask (matches app.py requirement)
+
+            // ===== CHANGE 2: FETCH REQUEST TO FLASK BACKEND =====
+            fetch('http://localhost:5000/api/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Prediction result from Flask:', data);
+
+                    // Check if Flask returned an error
+                    if (data.error) {
+                        hideLoading();
+                        showAlert('Server error: ' + data.error, 'error');
+                        return;
+                    }
+
+                    // Handle 'invalid' prediction (not a brain MRI)
+                    if (data.predicted_class === 'invalid') {
+                        hideLoading();
+                        showAlert('The uploaded image does not appear to be a valid brain MRI scan. Please upload a proper MRI image.', 'warning');
+                        return;
+                    }
+
+                    const patientId = 'PT-2025-' + Math.floor(Math.random() * 9000 + 1000);
+                    const scanId = 'SCAN-DR-' + Date.now();
+
+                    // ===== STORE FLASK PREDICTION RESULTS =====
+                    const pendingScan = {
+                        scanId: scanId,
+                        patientId: patientId,
+                        patientName: patientName,
+                        patientEmail: patientName.toLowerCase().replace(/\s+/g, '.') + '@example.com',
+                        uploadDate: new Date().toISOString(),
+                        predictedClass: data.predicted_class,
+                        confidence: data.confidence_percentage,
+                        probabilities: data.all_probabilities,
+                        gradcam: data.gradcam_image ? data.gradcam_image : null,
+                        image: sessionStorage.getItem('doctorUploadedImage') || imagePreview.src,
+                        fileName: mriFile.name,
+                        uploadedBy: 'doctor',
+                        status: 'uploaded',
+                        assignedDoctor: getUserSession().userData ? getUserSession().userData.email : 'doctor@example.com'
+                    };
+
+                    console.log('Scan data with prediction:', pendingScan);
+                    
+                    // Save to pendingScans so doctor-review can read it
+                    let pendingScans = JSON.parse(localStorage.getItem('pendingScans') || '[]');
+                    pendingScans.push(pendingScan);
+                    const saved = safeSavePendingScans(pendingScans);
+                    console.log('localStorage save result:', saved);
+
+                    // Save to doctorScans for fallback compatibility
+                    let doctorScans = JSON.parse(sessionStorage.getItem('doctorScans') || '[]');
+                    const legacyScan = {
+                        ...pendingScan,
+                        predicted_class: pendingScan.predictedClass,
+                        confidence_percentage: pendingScan.confidence,
+                        all_probabilities: pendingScan.probabilities,
+                        scanImage: pendingScan.image,
+                        heatmap: pendingScan.gradcam
+                    };
+                    doctorScans.push(legacyScan);
+                    try {
+                        sessionStorage.setItem('doctorScans', JSON.stringify(doctorScans));
+                    } catch (storageErr) {
+                        console.warn('sessionStorage save failed:', storageErr);
+                    }
+
+                    hideLoading();
+                    showAlert('MRI scan analyzed successfully!', 'success');
+
+                    setTimeout(function () {
+                        console.log('Redirecting to doctor result.html');
+                        window.location.href = 'doctor%20result.html?id=' + scanId;
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showAlert('Error analyzing scan: ' + error.message + '. Make sure Flask is running on localhost:5000', 'error');
+                });
+        });
+    </script>
+</body>
+
+</html>

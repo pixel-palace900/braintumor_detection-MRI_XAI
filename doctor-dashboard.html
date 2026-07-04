@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Neuro Diagnosis</title>
+    <meta name="description" content="Doctor dashboard for managing patient scans and analysis">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- html2pdf for direct downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/custom-style.css">
+
+    <style>
+        /* Force white text on green navbar */
+        .navbar-light .navbar-brand,
+        .navbar-light .navbar-brand span,
+        .navbar-light .navbar-nav .nav-link,
+        .navbar-light .navbar-nav .nav-link.active {
+            color: white !important;
+        }
+
+        .navbar-light .btn-outline-light {
+            color: white !important;
+            border-color: white !important;
+        }
+
+        .navbar-light .btn-outline-light:hover {
+            background-color: white !important;
+            color: #7BB66d !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top py-1"
+        style="background: linear-gradient(135deg, #7BB66d 0%, #7BB66d 100%);">
+        <div class="container-fluid px-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="doctor-dashboard.html">
+                <i class="bi bi-brain fs-3 me-2" style="color: white;"></i>
+                <div>
+                    <span class="fw-bold fs-5 d-block" style="color: white; line-height: 1.2;">Neuro Diagnosis</span>
+                    <small style="font-size: 0.65rem; opacity: 0.9; color: white;">Doctor Portal</small>
+                </div>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="doctor-dashboard.html">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#patient-management">
+                            <i class="bi bi-people me-1"></i>Patient Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="doctor-review.html">
+                            <i class="bi bi-search me-1"></i>Scan Review
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">
+                            <i class="bi bi-file-earmark-text me-1"></i>Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="doctor-profile.html">
+                            <i class="bi bi-person me-1"></i>Profile
+                        </a>
+                    </li>
+                    <!-- Notification Bell -->
+                    <li class="nav-item dropdown ms-lg-3">
+                        <a class="nav-link notification-bell-wrapper" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsRead(getUserSession().userData.email); updateNotificationUI();">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end nd-notification-dropdown" aria-labelledby="notificationDropdown" id="notificationList">
+                            <li class="dropdown-header">Notifications</li>
+                            <li><span class="dropdown-item text-muted small py-3">No new notifications</span></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Inline script to ensure notification UI updates on load
+        window.addEventListener('load', () => {
+            if (typeof updateNotificationUI === 'function') {
+                updateNotificationUI();
+            }
+        });
+    </script>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="container-fluid px-4">
+            <!-- Welcome Header -->
+            <div class="dashboard-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="h3 mb-2 fw-bold nd-text-primary">
+                            <i class="bi bi-person-badge me-2"></i>Welcome, <span id="doctorName">Dr. Aliza
+                                </span>
+                        </h1>
+                        <p class="nd-text-secondary mb-0">Professional Dashboard - Neuro Diagnosis System</p>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <a href="doctor-upload.html" class="btn nd-btn-primary me-2">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Patient Scan
+                        </a>
+                        <span class="badge bg-success px-3 py-2">
+                            <i class="bi bi-circle-fill me-2" style="font-size: 0.5rem;"></i>System Online
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row g-4 mb-4">
+                <!-- Total Scans -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Total Scans Analyzed</p>
+                                <h2 class="h2 fw-bold mb-0" style="color: #1e3a8a;">127</h2>
+                            </div>
+                            <div class="stat-icon" style="background: rgba(30, 58, 138, 0.1);">
+                                <i class="bi bi-file-earmark-medical" style="color: #1e3a8a;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scans Today -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Scans Today</p>
+                                <h2 class="h2 fw-bold mb-0 text-info">8</h2>
+                            </div>
+                            <div class="stat-icon bg-info bg-opacity-10">
+                                <i class="bi bi-calendar-check text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tumor Detected -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Tumor Detected</p>
+                                <h2 class="h2 fw-bold mb-0 text-danger">23</h2>
+                            </div>
+                            <div class="stat-icon bg-danger bg-opacity-10">
+                                <i class="bi bi-exclamation-triangle text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Review -->
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small">Pending Review</p>
+                                <h2 class="h2 fw-bold mb-0 text-warning">3</h2>
+                            </div>
+                            <div class="stat-icon bg-warning bg-opacity-10">
+                                <i class="bi bi-hourglass-split text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Queue Management -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="nd-card">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold nd-text-primary mb-2">
+                                        <i class="bi bi-funnel me-2"></i>Queue Management
+                                    </h5>
+                                    <p class="nd-text-secondary mb-0 small">Filter and manage patient scan queue</p>
+                                </div>
+                                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm nd-btn-outline active"
+                                            onclick="filterQueue('all')">
+                                            <i class="bi bi-list-ul me-1"></i>All
+                                        </button>
+                                        <button type="button" class="btn btn-sm nd-btn-outline"
+                                            onclick="filterQueue('urgent')">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Urgent
+                                        </button>
+                                        <button type="button" class="btn btn-sm nd-btn-outline"
+                                            onclick="filterQueue('pending')">
+                                            <i class="bi bi-hourglass-split me-1"></i>Pending
+                                        </button>
+                                        <button type="button" class="btn btn-sm nd-btn-outline"
+                                            onclick="filterQueue('doctor-upload')">
+                                            <i class="bi bi-person-badge me-1"></i>Doctor Uploads
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Patient Scans -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="nd-card">
+                        <div class="nd-card-header">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="bi bi-people me-2"></i>Patient Scan Queue
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="nd-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-3">Patient ID</th>
+                                            <th class="py-3">Patient Name</th>
+                                            <th class="py-3">Upload Date</th>
+                                            <th class="py-3">Priority</th>
+                                            <th class="py-3">Workflow</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="py-3">Result</th>
+                                            <th class="py-3">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scanQueueTable">
+                                        <!-- ... rows ... -->
+                                        <tr data-priority="urgent" data-workflow="doctor-upload" data-status="pending">
+                                            <td class="px-4 py-3"><span class="fw-semibold nd-text-primary">PT-2025-456</span></td>
+                                            <td class="py-3">Ahmad Khan</td>
+                                            <td class="py-3">Nov 20, 2025</td>
+                                            <td class="py-3"><span class="priority-urgent">Urgent</span></td>
+                                            <td class="py-3"><span class="badge bg-info">Doctor Upload</span></td>
+                                            <td class="py-3"><span class="badge bg-warning">Pending Review</span></td>
+                                            <td class="py-3"><span class="nd-badge-detected">Tumor Detected</span></td>
+                                            <td class="py-3">
+                                                <a href="doctor-review.html?id=456" class="btn btn-sm nd-btn-primary">
+                                                    <i class="bi bi-search me-1"></i>Review
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <!-- (truncated for brevity in edit tool) -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Archived Reports Section -->
+            <div id="reports" class="row mb-4">
+                <div class="col-12">
+                    <div class="nd-card">
+                        <div class="nd-card-header" style="background: linear-gradient(135deg, #7BB66d 0%, #7BB66d 100%);">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="bi bi-file-earmark-pdf me-2"></i>Archived Medical Reports
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="nd-table mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="px-4">Report ID</th>
+                                            <th>Patient Name</th>
+                                            <th>Analysis Type</th>
+                                            <th>Generated Date</th>
+                                            <th>Doctor</th>
+                                            <th class="text-end px-4">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="px-4"><strong>ND-RP-9982</strong></td>
+                                            <td>Maria Garcia</td>
+                                            <td>Post-Op MRI</td>
+                                            <td>Nov 19, 2025</td>
+                                            <td>Dr. Aliza</td>
+                                            <td class="text-end px-4">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="downloadArchiveReport('ND-RP-9982', 'Maria Garcia')">
+                                                    <i class="bi bi-download me-1"></i>PDF
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="viewArchiveReport('ND-RP-9982', 'Maria Garcia', 'Post-Op MRI', 'Nov 19, 2025')">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4"><strong>ND-RP-9975</strong></td>
+                                            <td>Li Wei</td>
+                                            <td>Routine Check</td>
+                                            <td>Nov 17, 2025</td>
+                                            <td>Dr. Aliza</td>
+                                            <td class="text-end px-4">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="downloadArchiveReport('ND-RP-9975', 'Li Wei')">
+                                                    <i class="bi bi-download me-1"></i>PDF
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="viewArchiveReport('ND-RP-9975', 'Li Wei', 'Routine Check', 'Nov 17, 2025')">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Preview Modal (Hidden by default) -->
+    <div class="modal fade" id="reportPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content report-modal-content border-0">
+                <div class="modal-header border-bottom bg-white sticky-top">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-eye me-2"></i>Archive Report Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-light">
+                    <div id="reportContent" class="report-document shadow-sm">
+                        <!-- Professional Header -->
+                        <div class="report-header">
+                            <div class="report-branding">
+                                <h1 class="report-logo-text"><i class="bi bi-brain me-2"></i>NEURO DIAGNOSIS</h1>
+                                <p class="text-muted small mb-0">Medical Image Analysis & Diagnostics</p>
+                            </div>
+                            <div class="report-doc-title text-end">
+                                <h2 class="h5 fw-bold mb-0">OFFICIAL MEDICAL REPORT</h2>
+                                <p class="text-muted small mb-0">ID: <span id="rptCaseId">ND-998822</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 1: Patient Information -->
+                        <div class="report-section">
+                            <div class="report-section-title">Patient Information</div>
+                            <div class="report-meta-grid">
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient Name:</span>
+                                    <span class="report-value" id="rptPatientName">--</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient ID:</span>
+                                    <span class="report-value" id="rptPatientId">PT-2025-000</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Date of Birth:</span>
+                                    <span class="report-value">Aug 14, 1988 (35Y)</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Examination Date:</span>
+                                    <span class="report-value" id="rptScanDate">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 2: Diagnostic Findings -->
+                        <div class="report-section">
+                            <div class="report-section-title">AI-Powered Diagnostic Analysis</div>
+                            <div class="report-results-content">
+                                <div class="report-finding-box">
+                                    <div id="rptAiBadge" class="report-ai-badge report-ai-detected">ABNORMAL</div>
+                                    <div class="mb-2">
+                                        <span class="report-label d-block text-muted small">Diagnostic Result:</span>
+                                        <span class="h5 fw-bold" id="rptAiFinding">--</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="report-label d-block text-muted small">AI Confidence Level:</span>
+                                        <span class="fw-bold" id="rptAiConfidence">--</span>
+                                    </div>
+                                    <p class="text-muted small">
+                                        <em>Disclaimer: AI analysis is intended as a clinical aid and must be reviewed by a certified physician before final diagnosis.</em>
+                                    </p>
+                                </div>
+                                <div class="report-image-box">
+                                    <img id="rptImg" src="images/heatmap-sample.jpg" alt="MRI Scan" class="img-fluid border rounded" style="max-width: 150px;">
+                                    <span class="report-label d-block mt-1">Reference MRI Scan</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Comments -->
+                        <div class="report-section">
+                            <div class="report-section-title">Clinical Assessment & Recommendations</div>
+                            <div class="p-3 border rounded bg-light-subtle" id="rptDrNotes" 
+                                 style="min-height: 150px; white-space: pre-wrap; font-size: 0.95rem;">
+                                Patient presented with recurring symptoms. AI analysis indicates early-stage Glioma. 
+                                Recommended immediate follow-up with neurosurgery department and contrast-enhanced CT for further localization.
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="report-signature-block">
+                            <div class="text-center">
+                                <p class="signature-font mb-0" id="rptDrSignature">Dr. Aliza</p>
+                                <div class="signature-line">
+                                    <strong id="rptDrName">Dr. Aliza</strong><br>
+                                    <span class="small text-muted">Attending Physician</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Footer -->
+                        <div class="mt-4 pt-3 border-top text-center text-muted small">
+                            Generated by Neuro Diagnosis v1.0 • Security Reference: ND-SEC-2025 • Page 1 of 1
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="downloadPDF()">
+                        <i class="bi bi-file-earmark-arrow-down me-2"></i>Download Archive PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-4" style="background: #f8f9fa; border-top: 1px solid #dee2e6;">
+        <small class="text-muted">
+            Neuro Diagnosis v1.0 | Powered by ResNet50 Transfer Learning
+        </small>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+    <!-- Dashboard Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const session = getUserSession();
+
+            if (!session.userType || session.userType !== 'doctor') {
+                window.location.href = 'doctor-login.html';
+                return;
+            }
+
+            if (session.userData && session.userData.name) {
+                document.getElementById('doctorName').textContent = session.userData.name;
+            }
+
+            // Populate pending scans
+            const scanQueueTable = document.getElementById('scanQueueTable');
+            let pendingScans = JSON.parse(localStorage.getItem('pendingScans') || '[]');
+            
+            // Filter out reviewed scans if we only want to show pending
+            // pendingScans = pendingScans.filter(s => s.status !== 'reviewed');
+
+            if (pendingScans.length === 0) {
+                scanQueueTable.innerHTML = `<tr><td colspan="8" class="text-center py-4">No pending scans found.</td></tr>`;
+            } else {
+                scanQueueTable.innerHTML = '';
+                pendingScans.forEach(scan => {
+                    const uploadDate = new Date(scan.uploadDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                    const isReviewed = scan.status === 'reviewed';
+                    const tr = document.createElement('tr');
+                    
+                    const tumorDetected = scan.predictedClass && scan.predictedClass !== 'no_tumor';
+                    const isDoctorUpload = scan.uploadedBy === 'doctor' || scan.uploadedBy === 'Doctor';
+                    
+                    tr.dataset.status = isReviewed ? 'reviewed' : 'pending';
+                    tr.dataset.workflow = isDoctorUpload ? 'doctor-upload' : 'patient-upload';
+                    tr.dataset.priority = tumorDetected ? 'urgent' : 'normal';
+                    
+                    let displayClass = scan.predictedClass || 'Unknown';
+                    const classDisplayNames = {
+                        'glioma_tumor': 'Glioma Tumor',
+                        'meningioma_tumor': 'Meningioma Tumor',
+                        'pituitary_tumor': 'Pituitary Tumor',
+                        'no_tumor': 'No Tumor'
+                    };
+                    displayClass = classDisplayNames[displayClass] || displayClass;
+
+                    tr.innerHTML = `
+                        <td class="px-4 py-3"><span class="fw-semibold nd-text-primary">${scan.scanId.substring(0, 8)}...</span></td>
+                        <td class="py-3">${scan.patientName}</td>
+                        <td class="py-3">${uploadDate}</td>
+                        <td class="py-3"><span class="${tumorDetected ? 'priority-urgent' : 'badge bg-secondary'}">${tumorDetected ? 'Urgent' : 'Normal'}</span></td>
+                        <td class="py-3"><span class="badge ${isDoctorUpload ? 'bg-primary' : 'bg-info'}">${isDoctorUpload ? 'Doctor Upload' : 'Patient Upload'}</span></td>
+                        <td class="py-3"><span class="badge ${isReviewed ? 'bg-success' : 'bg-warning'}">${isReviewed ? 'Reviewed' : 'Pending Review'}</span></td>
+                        <td class="py-3"><span class="${tumorDetected ? 'nd-badge-detected' : 'badge bg-success'}">${tumorDetected ? 'Tumor Detected' : 'No Tumor'}</span></td>
+                        <td class="py-3">
+                            <a href="${isDoctorUpload ? 'doctor result.html' : 'doctor-review.html'}?id=${encodeURIComponent(scan.scanId)}" class="btn btn-sm ${isReviewed ? 'btn-outline-secondary' : 'nd-btn-primary'}">
+                                <i class="bi bi-search me-1"></i>Review
+                            </a>
+                        </td>
+                    `;
+                    scanQueueTable.appendChild(tr);
+                });
+            }
+        });
+
+        // Function to populate and view archive report
+        function viewArchiveReport(id, name, type, date) {
+            document.getElementById('rptCaseId').textContent = id;
+            document.getElementById('rptPatientName').textContent = name;
+            document.getElementById('rptScanDate').textContent = date;
+            document.getElementById('rptAiFinding').textContent = type || 'Glioma Tumor';
+            document.getElementById('rptAiConfidence').textContent = '92.4%';
+            
+            // Show the modal
+            const reportModal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
+            reportModal.show();
+        }
+
+        // Function to download directly from archive table
+        function downloadArchiveReport(id, name) {
+            viewArchiveReport(id, name, 'Diagnostic Scan', 'Nov 20, 2025');
+            // Small timeout to allow modal content to settle for html2pdf
+            setTimeout(() => {
+                downloadPDF();
+            }, 500);
+        }
+
+        // Optimized PDF Download Function (Copied from Review page)
+        function downloadPDF() {
+            const element = document.getElementById('reportContent');
+            const patientId = document.getElementById('rptCaseId').textContent;
+            
+            element.style.boxShadow = 'none';
+            element.style.border = 'none';
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Archive_Report_${patientId}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            showAlert('Downloading archived report...', 'info');
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+                showAlert('Report downloaded from archives!', 'success');
+            });
+        }
+        // Function to filter patient scans in the queue
+        function filterQueue(filterType) {
+            const rows = document.querySelectorAll('#scanQueueTable tr');
+            rows.forEach(row => {
+                const priority = row.dataset.priority;
+                const workflow = row.dataset.workflow;
+                const status = row.dataset.status;
+                let show = false;
+
+                switch (filterType) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'urgent':
+                        show = priority === 'urgent';
+                        break;
+                    case 'pending':
+                        show = status === 'pending';
+                        break;
+                    case 'doctor-upload':
+                        show = workflow === 'doctor-upload';
+                        break;
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+
+</html>

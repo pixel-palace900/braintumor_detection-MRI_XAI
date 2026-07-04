@@ -1,0 +1,913 @@
+/* ===================================
+   Neuro Diagnosis - Custom Styles
+   Professional Medical Theme
+   =================================== */
+
+/* ===================================
+   1. Color Scheme Variables - Professional Medical Theme
+   =================================== */
+:root {
+    /* Core Colors */
+    --nd-primary: #7BB661;
+    --nd-primary-dark: #6BA055;
+    --nd-accent: #8CC9F0;
+    --nd-accent-dark: #6FB5E0;
+
+    /* Backgrounds */
+    --nd-bg-light: #FAFAF7;
+    --nd-bg-panel: #EED9B7;
+    --nd-bg-white: #FFFFFF;
+
+    /* Text */
+    --nd-text-dark: #8A6E45;
+    --nd-text-body: #333333;
+    --nd-text-muted: #666666;
+
+    /* Status Colors */
+    --nd-success: #7BB661;
+    --nd-success-dark: #6BA055;
+    --nd-warning: #f59e0b;
+    --nd-warning-dark: #d97706;
+    --nd-danger: #ef4444;
+    --nd-danger-dark: #dc2626;
+
+    /* Borders & Effects */
+    --nd-border: rgba(138, 110, 69, 0.2);
+    --nd-glow: 0 0 20px rgba(123, 182, 97, 0.3);
+
+    /* Shadows */
+    --nd-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.075);
+    --nd-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --nd-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+    --nd-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+
+    /* Transitions */
+    --nd-transition: all 0.3s ease;
+}
+
+/* ===================================
+   2. Logo & Branding Styles
+   =================================== */
+
+/* Neuro Diagnosis Logo */
+.nd-logo {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: var(--nd-primary);
+    text-shadow: 0 2px 4px rgba(123, 182, 97, 0.2);
+    letter-spacing: -0.025em;
+}
+
+.nd-logo-icon {
+    color: var(--nd-primary);
+    filter: drop-shadow(0 2px 4px rgba(123, 182, 97, 0.3));
+}
+
+.nd-brand-gradient {
+    background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Navigation Branding */
+.navbar-brand {
+    transition: var(--nd-transition);
+}
+
+.navbar-brand:hover {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 8px rgba(123, 182, 97, 0.4));
+}
+
+/* ===================================
+   3. Dashboard Cards
+   =================================== */
+
+.nd-card {
+    background: var(--nd-bg-white);
+    border-radius: 12px;
+    box-shadow: var(--nd-shadow);
+    border: 1px solid var(--nd-border);
+    transition: var(--nd-transition);
+    overflow: hidden;
+}
+
+.nd-card:hover {
+    box-shadow: var(--nd-shadow-lg), var(--nd-glow);
+    transform: translateY(-4px);
+    border-color: var(--nd-primary);
+}
+
+.nd-card-header {
+    background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-primary-dark) 100%);
+    color: white;
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+}
+
+.nd-stat-card {
+    background: var(--nd-bg-white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--nd-shadow);
+    border: 1px solid var(--nd-border);
+    transition: var(--nd-transition);
+    height: 100%;
+}
+
+.nd-stat-card:hover {
+    box-shadow: var(--nd-shadow-lg), var(--nd-glow);
+    transform: translateY(-4px);
+    border-color: var(--nd-primary);
+}
+
+/* ===================================
+   4. Result Boxes
+   =================================== */
+
+/* Tumor Detected - Danger Red */
+.nd-result-detected {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+    text-align: center;
+}
+
+/* No Tumor - Success Green */
+.nd-result-clear {
+    background: linear-gradient(135deg, var(--nd-success) 0%, var(--nd-success-dark) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(123, 182, 97, 0.3);
+    text-align: center;
+}
+
+/* Result Badges */
+.nd-badge-detected {
+    background: var(--nd-danger);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.nd-badge-clear {
+    background: var(--nd-success);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.nd-badge-pending {
+    background: var(--nd-warning);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* ===================================
+   5. Navigation Bar
+   =================================== */
+
+.nd-navbar {
+    background: var(--nd-bg-white);
+    box-shadow: var(--nd-shadow);
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--nd-border);
+}
+
+.nd-navbar-light {
+    background: var(--nd-bg-white);
+    box-shadow: var(--nd-shadow-sm);
+}
+
+.nd-nav-link {
+    color: var(--nd-text-body);
+    transition: var(--nd-transition);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+}
+
+.nd-nav-link:hover {
+    background: rgba(123, 182, 97, 0.1);
+    color: var(--nd-primary);
+}
+
+.nd-nav-link.active {
+    background: rgba(123, 182, 97, 0.15);
+    color: var(--nd-primary);
+    font-weight: 600;
+}
+
+/* ===================================
+   6. Image Preview Areas
+   =================================== */
+
+.nd-image-preview {
+    border: 2px solid var(--nd-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--nd-shadow);
+    transition: var(--nd-transition);
+}
+
+.nd-image-preview:hover {
+    box-shadow: var(--nd-shadow-lg), var(--nd-glow);
+    border-color: var(--nd-primary);
+}
+
+.nd-image-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===================================
+   7. Loading Spinner Animation
+   =================================== */
+
+.nd-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(250, 250, 247, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.nd-spinner {
+    width: 80px;
+    height: 80px;
+    border: 6px solid var(--nd-border);
+    border-top-color: var(--nd-primary);
+    border-radius: 50%;
+    animation: nd-spin 1s linear infinite;
+}
+
+@keyframes nd-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.nd-loading-text {
+    margin-top: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--nd-primary);
+    animation: nd-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes nd-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ===================================
+   8. Button Styles & Hover Effects
+   =================================== */
+
+.nd-btn-primary {
+    background: var(--nd-primary);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--nd-transition);
+    box-shadow: var(--nd-shadow);
+}
+
+.nd-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nd-shadow-lg), var(--nd-glow);
+    background: var(--nd-primary-dark);
+}
+
+.nd-btn-success {
+    background: linear-gradient(135deg, var(--nd-success) 0%, var(--nd-success-dark) 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--nd-transition);
+    box-shadow: var(--nd-shadow);
+}
+
+.nd-btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nd-shadow-lg);
+}
+
+.nd-btn-outline {
+    background: transparent;
+    border: 2px solid var(--nd-primary);
+    color: var(--nd-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--nd-transition);
+}
+
+.nd-btn-outline:hover {
+    background: var(--nd-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--nd-shadow), var(--nd-glow);
+}
+
+/* ===================================
+   9. Responsive Tables
+   =================================== */
+
+.nd-table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+    box-shadow: var(--nd-shadow);
+}
+
+.nd-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--nd-text-body);
+}
+
+.nd-table thead {
+    background: var(--nd-bg-panel);
+}
+
+.nd-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--nd-text-dark);
+    border-bottom: 2px solid var(--nd-border);
+}
+
+.nd-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--nd-border);
+}
+
+.nd-table tbody tr {
+    transition: var(--nd-transition);
+}
+
+.nd-table tbody tr:hover {
+    background: rgba(123, 182, 97, 0.05);
+}
+
+/* ===================================
+   10. Page Transitions & Animations
+   =================================== */
+
+.nd-fade-in {
+    animation: nd-fadeIn 0.6s ease-out;
+}
+
+@keyframes nd-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nd-slide-in {
+    animation: nd-slideIn 0.5s ease-out;
+}
+
+@keyframes nd-slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===================================
+   11. Footer Styling
+   =================================== */
+
+.nd-footer {
+    background: var(--nd-primary);
+    border-top: 1px solid var(--nd-border);
+    padding: 1.5rem 0;
+    text-align: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.nd-footer-brand {
+    font-weight: 600;
+    color: white;
+}
+
+/* ===================================
+   12. Mobile Responsive Styles
+   =================================== */
+
+@media (max-width: 768px) {
+    .nd-col-stack {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .nd-logo {
+        font-size: 1.25rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    .nd-table-responsive {
+        max-width: 100%;
+    }
+
+    .nd-card,
+    .nd-stat-card {
+        padding: 1rem;
+    }
+
+    .nd-navbar {
+        padding: 0.75rem 0;
+    }
+
+    .nd-btn-primary,
+    .nd-btn-success,
+    .nd-btn-outline {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .nd-stat-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nd-logo {
+        font-size: 1.1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .nd-card-header {
+        padding: 1rem;
+    }
+
+    .nd-table th,
+    .nd-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* ===================================
+   13. Utility Classes
+   =================================== */
+
+.nd-text-primary {
+    color: var(--nd-primary);
+}
+
+.nd-text-success {
+    color: var(--nd-success);
+}
+
+.nd-text-warning {
+    color: var(--nd-warning);
+}
+
+.nd-text-danger {
+    color: var(--nd-danger);
+}
+
+.nd-text-accent {
+    color: var(--nd-accent);
+}
+
+.nd-bg-primary {
+    background: var(--nd-primary);
+}
+
+.nd-bg-panel {
+    background: var(--nd-bg-panel);
+}
+
+.nd-bg-light {
+    background: var(--nd-bg-light);
+}
+
+.nd-shadow-sm {
+    box-shadow: var(--nd-shadow-sm);
+}
+
+.nd-shadow {
+    box-shadow: var(--nd-shadow);
+}
+
+.nd-shadow-lg {
+    box-shadow: var(--nd-shadow-lg);
+}
+
+.nd-glow {
+    box-shadow: var(--nd-glow);
+}
+
+.nd-rounded {
+    border-radius: 8px;
+}
+
+.nd-rounded-lg {
+    border-radius: 12px;
+}
+
+.nd-rounded-full {
+    border-radius: 9999px;
+}
+
+/* ===================================
+   14. Professional Medical Theme
+   =================================== */
+
+body {
+    background: var(--nd-bg-light);
+    color: var(--nd-text-body);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.nd-professional-header {
+    background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-primary-dark) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: var(--nd-shadow-lg), var(--nd-glow);
+}
+
+.nd-info-box {
+    background: var(--nd-bg-white);
+    border-left: 4px solid var(--nd-primary);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: var(--nd-shadow);
+    border: 1px solid var(--nd-border);
+}
+
+.nd-warning-box {
+    background: var(--nd-bg-white);
+    border-left: 4px solid var(--nd-warning);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.nd-danger-box {
+    background: var(--nd-bg-white);
+    border-left: 4px solid var(--nd-danger);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Accent Highlights (Blue for informational elements) */
+.nd-accent-highlight {
+    color: var(--nd-accent);
+}
+
+.nd-accent-border {
+    border-left: 3px solid var(--nd-accent);
+}
+
+.nd-accent-glow {
+    box-shadow: 0 0 18px rgba(140, 201, 240, 0.3);
+}
+
+/* ===================================
+   15. Report Generation & Print Styles
+   =================================== */
+
+/* Report Modal Styles */
+.report-document {
+    background: white;
+    padding: 2.2rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a;
+    line-height: 1.4;
+    width: 100%; /* Fit to container for easier capture */
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.report-header {
+    border-bottom: 3px solid var(--nd-primary);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-logo-text {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--nd-primary);
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.report-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 2.5rem;
+    row-gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.report-meta-item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f2f2f2;
+    padding-bottom: 0.4rem;
+}
+
+.report-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6d6d6d;
+    text-transform: uppercase;
+}
+
+.report-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.report-section {
+    margin-bottom: 1.8rem;
+}
+
+.report-section-title {
+    background: #f8fafc;
+    padding: 0.5rem 0.8rem;
+    border-left: 5px solid var(--nd-primary);
+    font-weight: 800;
+    color: var(--nd-primary);
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.report-results-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 2.5rem;
+}
+
+.report-finding-box {
+    flex: 1;
+}
+
+.report-image-box {
+    width: 150px;
+    text-align: center;
+}
+
+.report-image-box img {
+    border: 1px solid #e2e8f0;
+    padding: 3px;
+    background: #fff;
+    border-radius: 4px;
+    margin-bottom: 0.4rem;
+}
+
+.report-ai-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 4px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.8rem;
+    font-size: 0.85rem;
+}
+
+.report-ai-detected { background-color: #dc2626; }
+.report-ai-clear { background-color: #16a34a; }
+
+.report-signature-block {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.signature-line {
+    width: 220px;
+    border-top: 2px solid #1a1a1a;
+    text-align: center;
+    padding-top: 0.5rem;
+}
+
+.signature-font {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.8rem;
+    margin-bottom: -8px;
+}
+
+/* Print Overrides */
+@media print {
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    body {
+        background: white;
+    }
+    .modal-dialog {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    .report-document {
+        box-shadow: none !important;
+        width: 100% !important;
+        padding: 2cm !important;
+    }
+}
+
+/* ===================================
+   16. Notification System Styles
+   =================================== */
+
+.notification-bell-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    font-weight: 700;
+}
+
+.nd-notification-dropdown {
+    width: 320px;
+    max-height: 450px;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 0;
+}
+
+.nd-notification-dropdown .dropdown-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: var(--nd-primary);
+}
+
+.notification-item {
+    transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* ===================================
+   17. Profile & Account Styles
+   =================================== */
+
+.profile-header-card {
+    background: linear-gradient(135deg, #7BB661 0%, #6BA055 100%);
+    border-radius: 16px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(123, 182, 97, 0.2);
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+    background: white;
+}
+
+.verification-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.badge-verified {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.badge-pending {
+    background-color: #fefce8;
+    color: #854d0e;
+    border: 1px solid #fef08a;
+}
+
+.profile-stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+
+.profile-card {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.nav-pills-custom .nav-link {
+    color: #64748b;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.nav-pills-custom .nav-link.active {
+    background-color: #f0fdf4;
+    color: #166534;
+}

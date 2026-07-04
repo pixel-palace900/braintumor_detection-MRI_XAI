@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Scan - Neuro Diagnosis</title>
+    <meta name="description" content="Upload your MRI scan for AI-powered brain tumor detection">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container-fluid px-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="patient-dashboard.html">
+                <i class="bi bi-brain text-primary fs-2 me-2"></i>
+                <span class="fw-bold text-primary fs-4">Neuro Diagnosis</span>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="patient-dashboard.html">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="patient-upload.html">
+                            <i class="bi bi-cloud-upload me-1"></i>Upload Scan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#my-scans">
+                            <i class="bi bi-file-medical me-1"></i>My Scans
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile">
+                            <i class="bi bi-person me-1"></i>Profile
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="dashboard-header mb-4">
+                <h1 class="h3 fw-bold text-primary mb-2">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload MRI Scan
+                </h1>
+                <p class="text-muted mb-0">Upload your brain MRI scan for AI-powered analysis</p>
+            </div>
+
+            <!-- Instructions -->
+            <div class="alert alert-info border-0 shadow-sm mb-4">
+                <div class="d-flex">
+                    <i class="bi bi-info-circle fs-4 me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-2">Upload Instructions</h6>
+                        <p class="mb-0">Please upload your brain MRI scan in <strong>JPG or PNG format</strong>. Maximum
+                            file size: <strong>5MB</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <!-- Drag and Drop Area -->
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">
+                                    <i class="bi bi-cloud-arrow-up"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Drag and drop your MRI scan here</h5>
+                                <p class="text-muted mb-3">or click to browse</p>
+                                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" class="d-none">
+                                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                    <i class="bi bi-folder2-open me-2"></i>Browse Files
+                                </button>
+                            </div>
+
+                            <!-- Preview Area (Hidden by default) -->
+                            <div id="previewArea" class="mt-4 d-none">
+                                <h6 class="fw-bold mb-3">Preview</h6>
+                                <div class="row">
+                                    <div class="col-md-6 mx-auto">
+                                        <div class="image-preview mb-3">
+                                            <img id="imagePreview" src="" alt="MRI Scan Preview" class="img-fluid">
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="mb-1">
+                                                <i class="bi bi-file-earmark-image me-2 text-primary"></i>
+                                                <strong>File:</strong> <span id="fileName"></span>
+                                            </p>
+                                            <p class="mb-0 text-muted">
+                                                <i class="bi bi-hdd me-2"></i>
+                                                <strong>Size:</strong> <span id="fileSize"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="text-center mt-4">
+                                <button id="analyzeBtn" class="btn btn-primary btn-lg px-5" disabled>
+                                    <i class="bi bi-cpu me-2"></i>Analyze Scan
+                                </button>
+                                <button id="clearBtn" class="btn btn-outline-secondary btn-lg px-4 ms-2 d-none">
+                                    <i class="bi bi-x-circle me-2"></i>Clear
+                                </button>
+                            </div>
+
+                            <!-- Loading Overlay (Hidden by default) -->
+                            <div id="loadingOverlay" class="d-none">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary mb-3" style="width: 4rem; height: 4rem;"
+                                        role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <h5 class="fw-bold text-primary">Analyzing your scan...</h5>
+                                    <p class="text-muted">Please wait while our AI processes your MRI scan</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disclaimer -->
+                    <div class="alert alert-warning border-0 shadow-sm mt-4">
+                        <div class="d-flex">
+                            <i class="bi bi-exclamation-triangle fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-2">Important Disclaimer</h6>
+                                <p class="mb-0">
+                                    <strong>Neuro Diagnosis</strong> is an AI screening tool for research purposes.
+                                    Results must be verified by a qualified medical professional. This tool does not
+                                    replace professional medical diagnosis or treatment.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script src="js/ui-feedback.js"></script>
+
+    <!-- Upload Script -->
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewArea = document.getElementById('previewArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        let uploadedFile = null;
+
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function () {
+            const session = getUserSession();
+            if (!session.userType || session.userType !== 'patient') {
+                window.location.href = 'patient-login.html';
+            }
+        });
+
+        // Click to upload
+        uploadArea.addEventListener('click', function (e) {
+            if (e.target !== fileInput) {
+                fileInput.click();
+            }
+        });
+
+        // Drag and drop events
+        uploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function (e) {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Handle file upload
+        function handleFile(file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                showAlert('Please upload a JPG or PNG file', 'danger');
+                return;
+            }
+
+            // Validate file size (5MB max)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                showAlert('File size must be less than 5MB', 'danger');
+                return;
+            }
+
+            uploadedFile = file;
+
+            // Display file info
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+
+            // Preview image using FileReader, then compress before storing
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const originalDataUrl = e.target.result;
+
+                // Show preview immediately from original
+                imagePreview.src = originalDataUrl;
+                previewArea.classList.remove('d-none');
+                analyzeBtn.disabled = false;
+                clearBtn.classList.remove('d-none');
+
+                // Compress using the shared utility from main.js
+                compressImage(originalDataUrl, 800, 0.75)
+                    .then(compressedDataUrl => {
+                        try {
+                            sessionStorage.setItem('uploadedImage', compressedDataUrl);
+                            sessionStorage.setItem('uploadedFileName', file.name);
+                        } catch (quotaErr) {
+                            // If still too large, try lower quality
+                            compressImage(originalDataUrl, 800, 0.4)
+                                .then(lowerQuality => {
+                                    sessionStorage.setItem('uploadedImage', lowerQuality);
+                                    sessionStorage.setItem('uploadedFileName', file.name);
+                                })
+                                .catch(e2 => console.warn('Could not store image in sessionStorage:', e2));
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Image compression failed, using original data:', err);
+                        try {
+                            sessionStorage.setItem('uploadedImage', originalDataUrl);
+                            sessionStorage.setItem('uploadedFileName', file.name);
+                        } catch (e) {
+                            console.warn('Could not store original image in sessionStorage:', e);
+                        }
+                    });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Clear upload
+        clearBtn.addEventListener('click', function () {
+            uploadedFile = null;
+            fileInput.value = '';
+            previewArea.classList.add('d-none');
+            analyzeBtn.disabled = true;
+            clearBtn.classList.add('d-none');
+            sessionStorage.removeItem('uploadedImage');
+            sessionStorage.removeItem('uploadedFileName');
+        });
+
+        // Analyze scan - UPDATED TO USE REAL BACKEND
+        analyzeBtn.addEventListener('click', async function () {
+            if (!uploadedFile) return;
+
+            // Hide upload area and show loading
+            uploadArea.style.display = 'none';
+            previewArea.classList.add('d-none');
+            analyzeBtn.classList.add('d-none');
+            clearBtn.classList.add('d-none');
+            loadingOverlay.classList.remove('d-none');
+
+            try {
+                // Create FormData and append the image file
+                const formData = new FormData();
+                formData.append('image', uploadedFile);
+
+                // Send POST request to Flask backend
+                const response = await fetch('http://localhost:5000/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Store prediction results in sessionStorage
+                    // Use keys that match doctor-review.html expectations
+                    sessionStorage.setItem('predicted_class', result.predicted_class);
+                    sessionStorage.setItem('confidence_percentage', result.confidence_percentage.toFixed(2));
+
+                    // Normalize probability keys to match doctor-review.html format (e.g. 'glioma_tumor')
+                    const rawProbs = result.all_probabilities || {};
+                    const normalizedProbs = {
+                        glioma_tumor:     (rawProbs['glioma_tumor']     ?? rawProbs['glioma']     ?? 0),
+                        meningioma_tumor: (rawProbs['meningioma_tumor'] ?? rawProbs['meningioma'] ?? 0),
+                        pituitary_tumor:  (rawProbs['pituitary_tumor']  ?? rawProbs['pituitary']  ?? 0),
+                        no_tumor:         (rawProbs['no_tumor']         ?? rawProbs['notumor']    ?? 0)
+                    };
+                    sessionStorage.setItem('probabilities', JSON.stringify(normalizedProbs));
+
+                    // Store patient info for doctor-review
+                    const session = getUserSession();
+                    if (session && session.userData) {
+                        sessionStorage.setItem('patientName', session.userData.name || session.userData.email || 'Patient');
+                        sessionStorage.setItem('patientId', session.userData.id || 'PT-' + Date.now());
+                        sessionStorage.setItem('patientEmail', session.userData.email || '');
+                    }
+
+                    // uploadedImage is already stored in handleFile function
+                    // Redirect to results page after short delay
+                    setTimeout(function () {
+                        window.location.href = 'patient-results-new.html';
+                    }, 500);
+                } else {
+                    throw new Error('Prediction failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error during prediction:', error);
+
+                // Hide loading overlay
+                loadingOverlay.classList.add('d-none');
+
+                // Show upload area again
+                uploadArea.style.display = '';
+                previewArea.classList.remove('d-none');
+                analyzeBtn.classList.remove('d-none');
+                clearBtn.classList.remove('d-none');
+
+                // Show error message
+                showAlert('Failed to analyze scan. Please ensure the backend server is running at http://localhost:5000 and try again. Error: ' + error.message, 'danger');
+            }
+        });
+    </script>
+</body>
+
+</html>

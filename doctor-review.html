@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Review - Neuro Diagnosis</title>
+    <meta name="description" content="Detailed scan analysis review for medical professionals">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- html2pdf for direct downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Force white text on green navbar */
+        .navbar-light .navbar-brand,
+        .navbar-light .navbar-brand span,
+        .navbar-light .navbar-nav .nav-link,
+        .navbar-light .navbar-nav .nav-link.active {
+            color: white !important;
+        }
+
+        .navbar-light .btn-outline-light {
+            color: white !important;
+            border-color: white !important;
+        }
+
+        .navbar-light .btn-outline-light:hover {
+            background-color: white !important;
+            color: #7BB66d !important;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top"
+        style="background: linear-gradient(120deg, #7BB66d 0%, #7BB66d 100%);">
+        <div class="container-fluid px-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="doctor-dashboard.html">
+                <i class="bi bi-brain fs-2 me-2" style="color: white;"></i>
+                <div>
+                    <span class="fw-bold fs-4 d-block" style="color: white;">Neuro Diagnosis</span>
+                    <small style="font-size: 0.7rem; opacity: 0.9; color: white;">Doctor Portal</small>
+                </div>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="doctor-dashboard.html">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#patient-management">
+                            <i class="bi bi-people me-1"></i>Patient Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" href="doctor-review.html">
+                            <i class="bi bi-search me-1"></i>Scan Review
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports">
+                            <i class="bi bi-file-earmark-text me-1"></i>Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="doctor-profile.html">
+                            <i class="bi bi-person me-1"></i>Profile
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                            <i class="bi bi-box-arrow-right me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="container-fluid px-4">
+            <!-- Patient Information Header -->
+            <div class="card border-0 shadow-sm mb-4"
+                style="background: linear-gradient(135deg, #7BB66d 0%, #7BB66d 100%); color: white;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="fw-bold mb-3">
+                                <i class="bi bi-person-circle me-2"></i>Patient Information
+                            </h4>
+                            <div class="row">
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <small class="opacity-75">Patient Name</small>
+                                    <p class="mb-0 fw-bold" id="displayPatientName">--</p>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <small class="opacity-75">Patient ID</small>
+                                    <p class="mb-0 fw-bold" id="displayPatientId">--</p>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <small class="opacity-75">Age</small>
+                                    <p class="mb-0 fw-bold">--</p>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 mb-2">
+                                    <small class="opacity-75">Scan Date</small>
+                                    <p class="mb-0 fw-bold" id="displayScanDate">--</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!--
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <button class="btn btn-warning me-2" onclick="loadTestData()">
+                                <i class="bi bi-database me-2"></i>Load Test Data
+                            </button>-->
+                            <a href="doctor-dashboard.html" class="btn btn-light">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Analysis Results Section -->
+            <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #7BB66d !important;">
+                <div class="card-header py-3"
+                    style="background: linear-gradient(135deg, #7BB66d 0%, #7BB66d 100%); color: white;">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-cpu me-2"></i>AI Analysis Results
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Tumor Classification Result -->
+                    <div id="aiResultCard" class="text-center mb-4 p-4 rounded"
+                        style="background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);">
+                        <i class="bi bi-exclamation-triangle-fill text-white" style="font-size: 3rem;"></i>
+                        <h3 class="text-white fw-bold mt-2 mb-1" id="tumorClassification">Tumor Detected</h3>
+                        <p class="text-white mb-0 opacity-75" id="modelConfidenceText">Model Confidence: --</p>
+                    </div>
+
+                    <!-- Two Column Layout: MRI Image + Probabilities -->
+                    <div class="row g-4">
+                        <!-- Left: MRI Scan Image -->
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-light border-bottom py-3">
+                                    <h6 class="mb-0 fw-bold" style="color: #7BB66d;">
+                                        <i class="bi bi-file-earmark-medical me-2"></i>Analyzed MRI Scan
+                                    </h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <div class="image-preview">
+                                        <img id="originalMRI" src="images/heatmap-sample.jpg" alt="Original MRI"
+                                            class="img-fluid rounded">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: All Probabilities Breakdown -->
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-light border-bottom py-3">
+                                    <h6 class="mb-0 fw-bold" style="color: #7BB66d;">
+                                        <i class="bi bi-bar-chart me-2"></i>All Probabilities Breakdown
+                                    </h6>
+                                </div>
+                                <div class="card-body p-3">
+                                    <!-- GLIOMA TUMOR -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-semibold">Glioma Tumor</span>
+                                            <span class="fw-bold" style="color: #7BB66d;" id="probGlioma">0.00%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="barGlioma" class="progress-bar"
+                                                style="width: 0%; background-color: #7BB66d;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- MENINGIOMA TUMOR -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-semibold">Meningioma Tumor</span>
+                                            <span class="fw-bold" style="color: #7BB66d;"
+                                                id="probMeningioma">0.00%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="barMeningioma" class="progress-bar"
+                                                style="width: 0%; background-color: #7BB66d;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PITUITARY TUMOR -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-semibold">Pituitary Tumor</span>
+                                            <span class="fw-bold" style="color: #7BB66d;"
+                                                id="probPituitary">0.00%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="barPituitary" class="progress-bar"
+                                                style="width: 0%; background-color: #7BB66d;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- NO TUMOR -->
+                                    <div class="mb-0">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="fw-semibold">No Tumor</span>
+                                            <span class="fw-bold" style="color: #4caf50;" id="probNoTumor">0.00%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="barNoTumor" class="progress-bar bg-success" style="width: 0%;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Information -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Model Accuracy</small>
+                                <p class="mb-0 fw-semibold" id="modelAccuracy">--</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Precision</small>
+                                <p class="mb-0 fw-semibold" id="modelPrecision">--</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Recall</small>
+                                <p class="mb-0 fw-semibold" id="modelRecall">--</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">F1-Score</small>
+                                <p class="mb-0 fw-semibold" id="modelF1">--</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor's Clinical Assessment Section -->
+            <div class="card border-0 shadow-sm mb-4" style="border-left: 4px solid #1e40af !important;">
+                <div class="card-header py-3"
+                    style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white;">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-clipboard-pulse me-2"></i>Doctor's Clinical Assessment
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> Please provide your professional clinical assessment based on the AI
+                        analysis and your medical expertise.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="doctorNotes" class="form-label fw-bold">Clinical Notes & Observations</label>
+                        <textarea class="form-control" id="doctorNotes" rows="6"
+                            placeholder="Enter your clinical assessment, observations, and recommendations here...&#10;&#10;Example:&#10;- Patient history reviewed&#10;- Clinical correlation with symptoms&#10;- Recommended next steps&#10;- Treatment plan considerations"></textarea>
+                        <small class="text-muted">Required before saving assessment</small>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="doctorName" class="form-label fw-bold">Doctor Name</label>
+                            <input type="text" class="form-control" id="doctorNameInput" placeholder="Dr. Sarah Johnson"
+                                readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="assessmentDate" class="form-label fw-bold">Assessment Date</label>
+                            <input type="text" class="form-control" id="assessmentDate" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="doctorApproval">
+                        <label class="form-check-label fw-semibold" for="doctorApproval">
+                            I confirm that I have reviewed the AI analysis and provided my professional clinical
+                            assessment
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary px-4" onclick="saveAssessment()">
+                            <i class="bi bi-save me-2"></i>Save Assessment
+                        </button>
+                        <button class="btn btn-outline-secondary px-4" onclick="clearNotes()">
+                            <i class="bi bi-x-circle me-2"></i>Clear Notes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mb-4">
+                <a href="doctor-dashboard.html" class="btn btn-outline-primary btn-lg px-5 me-2">
+                    <i class="bi bi-arrow-left me-2"></i>Dashboard
+                </a>
+                <button id="generateReportBtn" class="btn btn-primary btn-lg px-5 me-2" onclick="generateReport()" disabled>
+                    <i class="bi bi-file-earmark-medical me-2"></i>Generate Report
+                </button>
+                <button class="btn btn-success btn-lg px-5" onclick="nextPatient()">
+                    <i class="bi bi-arrow-right me-2"></i>Next Patient
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Preview Modal -->
+    <div class="modal fade" id="reportPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content report-modal-content">
+                <div class="modal-header bg-light border-bottom">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-eye me-2"></i>Report Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-light">
+                    <div id="reportContent" class="report-document shadow-sm">
+                        <!-- Professional Header -->
+                        <div class="report-header">
+                            <div class="report-branding">
+                                <h1 class="report-logo-text"><i class="bi bi-brain me-2"></i>NEURO DIAGNOSIS</h1>
+                                <p class="text-muted small mb-0">Medical Image Analysis & Diagnostics</p>
+                            </div>
+                            <div class="report-doc-title text-end">
+                                <h2 class="h5 fw-bold mb-0">OFFICIAL MEDICAL REPORT</h2>
+                                <p class="text-muted small mb-0">ID: <span id="rptCaseId">ND-998822</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 1: Patient Information -->
+                        <div class="report-section">
+                            <div class="report-section-title">Patient Information</div>
+                            <div class="report-meta-grid">
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient Name:</span>
+                                    <span class="report-value" id="rptPatientName">--</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient ID:</span>
+                                    <span class="report-value" id="rptPatientId">--</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Date of Birth:</span>
+                                    <span class="report-value">Aug 14, 1988 (35Y)</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Examination Date:</span>
+                                    <span class="report-value" id="rptScanDate">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 2: Diagnostic Findings -->
+                        <div class="report-section">
+                            <div class="report-section-title">AI-Powered Diagnostic Analysis</div>
+                            <div class="report-results-content">
+                                <div class="report-finding-box">
+                                    <div id="rptAiBadge" class="report-ai-badge">ABNORMAL</div>
+                                    <div class="mb-2">
+                                        <span class="report-label d-block text-muted small">Diagnostic Result:</span>
+                                        <span class="h5 fw-bold" id="rptAiFinding">--</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="report-label d-block text-muted small">AI Confidence Level:</span>
+                                        <span class="fw-bold" id="rptAiConfidence">--</span>
+                                    </div>
+                                    <p class="text-muted small">
+                                        <em>Disclaimer: AI analysis is intended as a clinical aid and must be reviewed by a certified physician before final diagnosis.</em>
+                                    </p>
+                                </div>
+                                <div class="report-image-box">
+                                    <img id="rptImg" src="" alt="MRI Scan" class="img-fluid border rounded" style="max-width: 150px;">
+                                    <span class="report-label d-block mt-1">Reference MRI Scan</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Comments -->
+                        <div class="report-section">
+                            <div class="report-section-title">Clinical Assessment & Recommendations</div>
+                            <div class="p-3 border rounded bg-light-subtle" id="rptDrNotes" 
+                                 style="min-height: 180px; white-space: pre-wrap; font-size: 0.95rem;">
+                                --
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="report-signature-block">
+                            <div class="text-center">
+                                <p class="signature-font mb-0" id="rptDrSignature">Dr. Sarah Johnson</p>
+                                <div class="signature-line">
+                                    <strong id="rptDrName">Dr. Sarah Johnson</strong><br>
+                                    <span class="small text-muted">Attending Physician</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Footer -->
+                        <div class="mt-4 pt-3 border-top text-center text-muted small">
+                            Generated by Neuro Diagnosis v1.0 • Security Reference: ND-SEC-2025 • Page 1 of 1
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="downloadPDF()">
+                        <i class="bi bi-file-earmark-arrow-down me-2"></i>Download Official PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+    <!-- Review Script -->
+    <script>
+        // ===== FIXED SCRIPT TO READ FLASK PREDICTION DATA =====
+
+        function loadTestData() {
+            sessionStorage.setItem('predicted_class', 'glioma_tumor');
+            sessionStorage.setItem('confidence_percentage', '92.41');
+            sessionStorage.setItem('probabilities', JSON.stringify({
+                'glioma_tumor': 0.9241,
+                'meningioma_tumor': 0.0523,
+                'pituitary_tumor': 0.0189,
+                'no_tumor': 0.0047
+            }));
+            sessionStorage.setItem('patientName', 'Ahmad Khan');
+            sessionStorage.setItem('patientId', 'PT-2025-456');
+
+            // Also store the sample image as uploadedImage so MRI section shows it
+            const sampleImg = new Image();
+            sampleImg.crossOrigin = 'anonymous';
+            sampleImg.onload = function () {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = sampleImg.width;
+                    canvas.height = sampleImg.height;
+                    canvas.getContext('2d').drawImage(sampleImg, 0, 0);
+                    sessionStorage.setItem('uploadedImage', canvas.toDataURL('image/jpeg', 0.85));
+                } catch (e) {
+                    // If canvas blocked (local file CORS), fall back to path string
+                    sessionStorage.setItem('uploadedImage', 'images/heatmap-sample.jpg');
+                }
+                showAlert('Test data loaded! Refreshing page...', 'success');
+                setTimeout(() => { location.reload(); }, 1000);
+            };
+            sampleImg.onerror = function () {
+                // If image fails to load, store the path directly
+                sessionStorage.setItem('uploadedImage', 'images/heatmap-sample.jpg');
+                showAlert('Test data loaded! Refreshing page...', 'success');
+                setTimeout(() => { location.reload(); }, 1000);
+            };
+            sampleImg.src = 'images/heatmap-sample.jpg';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('=== REVIEW PAGE LOADED ===');
+
+            // Session Check
+            const session = getUserSession();
+            if (!session.userType || session.userType !== 'doctor') {
+                window.location.href = 'doctor-login.html';
+                return;
+            }
+
+            // Set doctor name and assessment date
+            if (session.userData && session.userData.name) {
+                document.getElementById('doctorNameInput').value = session.userData.name;
+            }
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('assessmentDate').value = today;
+
+            // ===== READ DATA FROM pendingScans based on ID =====
+            const urlParams = new URLSearchParams(window.location.search);
+            const scanId = urlParams.get('id');
+            let scanData = null;
+            let pendingScans = JSON.parse(localStorage.getItem('pendingScans') || '[]');
+            
+            if (scanId) {
+                scanData = pendingScans.find(s => s.scanId === scanId);
+            } else if (pendingScans.length > 0) {
+                scanData = pendingScans.find(s => s.status !== 'reviewed') || pendingScans[0];
+            }
+
+            if (!scanData) {
+                showAlert('No scan found to review. Please select a scan from the dashboard.', 'warning');
+                return;
+            }
+
+            window.currentScanId = scanData.scanId;
+            window.currentPatientEmail = scanData.patientEmail;
+            window.currentUploadedBy = scanData.uploadedBy;
+            window.currentScanData = scanData;
+            
+            const predictedClass = scanData.predictedClass;
+            const confidencePercentage = scanData.confidence;
+            const probabilitiesStr = typeof scanData.probabilities === 'string' ? scanData.probabilities : JSON.stringify(scanData.probabilities);
+            const patientName = scanData.patientName || sessionStorage.getItem('patientName');
+            const patientId = scanData.scanId.substring(0, 8).toUpperCase();
+
+            console.log('Prediction data loaded from pendingScans:');
+            // ... (logs hidden for brevity)
+
+            // Display patient information
+            document.getElementById('displayPatientName').textContent = patientName || '--';
+            document.getElementById('displayPatientId').textContent = patientId || '--';
+            document.getElementById('displayScanDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Update Analysis Date/Time
+            const now = new Date();
+            const dateTimeOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            if(document.getElementById('analysisDateTime')) {
+                document.getElementById('analysisDateTime').textContent = now.toLocaleDateString('en-US', dateTimeOptions);
+            }
+
+            // ===== DISPLAY PREDICTION RESULTS =====
+            if (predictedClass && confidencePercentage && probabilitiesStr) {
+                const probabilities = JSON.parse(probabilitiesStr);
+
+                // Map class names to display names
+                const classDisplayNames = {
+                    'glioma_tumor': 'Glioma Tumor',
+                    'meningioma_tumor': 'Meningioma Tumor',
+                    'pituitary_tumor': 'Pituitary Tumor',
+                    'no_tumor': 'No Tumor'
+                };
+
+                const displayName = classDisplayNames[predictedClass] || predictedClass;
+                const tumorDetected = predictedClass !== 'no_tumor';
+
+                // Update the classification result card
+                const aiResultCard = document.getElementById('aiResultCard');
+                const tumorClassification = document.getElementById('tumorClassification');
+                const modelConfidenceText = document.getElementById('modelConfidenceText');
+
+                if (tumorDetected) {
+                    aiResultCard.style.background = 'linear-gradient(135deg, #ff9800 0%, #ff6f00 100%)';
+                    tumorClassification.innerHTML = `Tumor Detected: ${displayName}`;
+                } else {
+                    aiResultCard.style.background = 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)';
+                    tumorClassification.innerHTML = 'No Tumor Detected';
+                }
+                modelConfidenceText.textContent = `Model Confidence: ${confidencePercentage}%`;
+
+                // ===== LOAD MRI IMAGE from scanData =====
+                const uploadedImage = scanData.gradcam || scanData.image;
+                const mriImg = document.getElementById('originalMRI');
+                if (uploadedImage) {
+                    mriImg.src = uploadedImage;
+                    mriImg.onerror = function () {
+                        mriImg.onerror = null;
+                        mriImg.src = 'images/heatmap-sample.jpg';
+                    };
+                } else {
+                    mriImg.src = 'images/heatmap-sample.jpg';
+                }
+
+                // ===== UPDATE PROBABILITY BARS =====
+                const gliomaProb = (probabilities['glioma_tumor'] * 100) || 0;
+                const meningiomaProb = (probabilities['meningioma_tumor'] * 100) || 0;
+                const pituitaryProb = (probabilities['pituitary_tumor'] * 100) || 0;
+                const noTumorProb = (probabilities['no_tumor'] * 100) || 0;
+
+                document.getElementById('probGlioma').textContent = gliomaProb.toFixed(2) + '%';
+                document.getElementById('barGlioma').style.width = gliomaProb + '%';
+                document.getElementById('probMeningioma').textContent = meningiomaProb.toFixed(2) + '%';
+                document.getElementById('barMeningioma').style.width = meningiomaProb + '%';
+                document.getElementById('probPituitary').textContent = pituitaryProb.toFixed(2) + '%';
+                document.getElementById('barPituitary').style.width = pituitaryProb + '%';
+                document.getElementById('probNoTumor').textContent = noTumorProb.toFixed(2) + '%';
+                document.getElementById('barNoTumor').style.width = noTumorProb + '%';
+
+                // ===== DISPLAY MODEL METRICS =====
+                document.getElementById('modelAccuracy').textContent = '46.19%';
+                document.getElementById('modelPrecision').textContent = '47.50%';
+                document.getElementById('modelRecall').textContent = '46.19%';
+                document.getElementById('modelF1').textContent = '43.70%';
+            }
+        });
+
+        // Save Assessment Function
+        function saveAssessment() {
+            const notes = document.getElementById('doctorNotes').value.trim();
+            const approval = document.getElementById('doctorApproval').checked;
+
+            if (!notes) {
+                showAlert('Please enter your clinical notes before saving.', 'warning');
+                document.getElementById('doctorNotes').focus();
+                return;
+            }
+
+            if (!approval) {
+                showAlert('Please confirm your assessment by checking the approval checkbox.', 'warning');
+                return;
+            }
+
+            const assessment = {
+                notes: notes,
+                doctorName: document.getElementById('doctorNameInput').value,
+                assessmentDate: document.getElementById('assessmentDate').value,
+                timestamp: new Date().toISOString()
+            };
+
+            if (window.currentScanId) {
+                localStorage.setItem('doctorReport_' + window.currentScanId, JSON.stringify(assessment));
+                let pendingScans = JSON.parse(localStorage.getItem('pendingScans') || '[]');
+                let scanIndex = pendingScans.findIndex(s => s.scanId === window.currentScanId);
+                if (scanIndex !== -1) {
+                    pendingScans[scanIndex].status = 'reviewed';
+                    safeSavePendingScans(pendingScans);
+                }
+            } else {
+                sessionStorage.setItem('doctorAssessment', JSON.stringify(assessment));
+            }
+
+            // Notify the Patient only if not uploaded by Doctor
+            if (window.currentUploadedBy !== 'Doctor') {
+                const patientEmail = window.currentPatientEmail || sessionStorage.getItem('patientEmail') || 'ahmad.k@email.com';
+                
+                addNotification(
+                    patientEmail, 
+                    `Your clinical assessment for scan ${window.currentScanId ? window.currentScanId.substring(0,8) : 'SC-9984'} is complete.`, 
+                    'success'
+                );
+
+                showAlert('Assessment saved and Patient notified!', 'success');
+            } else {
+                showAlert('Assessment saved successfully.', 'success');
+            }
+            
+            // Enable generate report button
+            const genBtn = document.getElementById('generateReportBtn');
+            if(genBtn) genBtn.disabled = false;
+        }
+
+        // Generate Report Function
+        function generateReport() {
+            let assessmentStr = null;
+            if (window.currentScanId) {
+                assessmentStr = localStorage.getItem('doctorReport_' + window.currentScanId);
+            }
+            if (!assessmentStr) {
+                assessmentStr = sessionStorage.getItem('doctorAssessment');
+            }
+
+            if (!assessmentStr) {
+                showAlert('Please save the clinical assessment first.', 'warning');
+                return;
+            }
+
+            const assessment = JSON.parse(assessmentStr);
+            
+            // Get prediction details from window.currentScanData if available, otherwise fallback
+            let predictedClass = 'no_tumor';
+            let confidence = '0';
+            let patientName = 'Patient';
+            let patientId = 'PT-2025-000';
+            let scanImg = 'images/heatmap-sample.jpg';
+
+            if (window.currentScanData) {
+                predictedClass = window.currentScanData.predictedClass || 'no_tumor';
+                confidence = window.currentScanData.confidence || '0';
+                patientName = window.currentScanData.patientName || 'Patient';
+                patientId = window.currentScanData.scanId.substring(0, 8).toUpperCase();
+                scanImg = window.currentScanData.gradcam || window.currentScanData.image || 'images/heatmap-sample.jpg';
+            } else {
+                predictedClass = sessionStorage.getItem('predicted_class') || 'no_tumor';
+                confidence = sessionStorage.getItem('confidence_percentage') || '0';
+                patientName = sessionStorage.getItem('patientName') || 'Patient';
+                patientId = sessionStorage.getItem('patientId') || 'PT-2025-000';
+                scanImg = sessionStorage.getItem('uploadedImage') || 'images/heatmap-sample.jpg';
+            }
+
+            // Map class names to display names
+            const classDisplayNames = {
+                'glioma_tumor': 'Glioma Tumor',
+                'meningioma_tumor': 'Meningioma Tumor',
+                'pituitary_tumor': 'Pituitary Tumor',
+                'no_tumor': 'No Tumor'
+            };
+
+            const displayName = classDisplayNames[predictedClass] || predictedClass;
+            const tumorDetected = predictedClass !== 'no_tumor';
+
+            // Populate Modal
+            document.getElementById('rptCaseId').textContent = 'ND-' + (window.currentScanId ? window.currentScanId.substring(0, 8).toUpperCase() : Math.floor(100000 + Math.random() * 900000));
+            document.getElementById('rptPatientName').textContent = patientName;
+            document.getElementById('rptPatientId').textContent = patientId;
+            document.getElementById('rptScanDate').textContent = assessment.assessmentDate;
+            
+            const badge = document.getElementById('rptAiBadge');
+            badge.textContent = tumorDetected ? 'ABNORMAL' : 'NORMAL';
+            badge.className = 'report-ai-badge ' + (tumorDetected ? 'report-ai-detected' : 'report-ai-clear');
+            
+            document.getElementById('rptAiFinding').textContent = displayName;
+            document.getElementById('rptAiConfidence').textContent = confidence + '%';
+            document.getElementById('rptImg').src = scanImg;
+            document.getElementById('rptDrNotes').textContent = assessment.notes;
+            document.getElementById('rptDrName').textContent = assessment.doctorName;
+            document.getElementById('rptDrSignature').textContent = assessment.doctorName;
+
+            // Show Modal
+            const reportModal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
+            reportModal.show();
+        }
+
+        // Direct PDF Download Function
+        function downloadPDF() {
+            const element  = document.getElementById('reportContent');
+            const patientId = document.getElementById('rptPatientId').textContent;
+            const rptImg   = document.getElementById('rptImg');
+
+            const originalSrc = rptImg ? rptImg.src : '';
+            let imgWasHidden  = false;
+
+            if (rptImg) {
+                if (rptImg.src.startsWith('data:')) {
+                    // OK
+                } else {
+                    rptImg.style.display = 'none';
+                    imgWasHidden = true;
+                }
+            }
+
+            element.style.boxShadow = 'none';
+            element.style.border    = 'none';
+
+            const opt = {
+                margin:      [10, 10, 10, 10],
+                filename:    `Medical_Report_${patientId}.pdf`,
+                image:       { type: 'jpeg', quality: 1.0 },
+                html2canvas: {
+                    scale:           3,
+                    useCORS:         true,
+                    allowTaint:      false,   // must stay false to allow toDataURL()
+                    letterRendering: true,
+                    logging:         false,
+                    scrollY:         0,
+                    scrollX:         0
+                },
+                jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            showAlert('Generating High-Definition PDF... Please wait.', 'info');
+
+            html2pdf().set(opt).from(element).save()
+                .then(() => {
+                    element.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+                    if (imgWasHidden && rptImg) { rptImg.style.display = ''; rptImg.src = originalSrc; }
+                    showAlert('Report downloaded successfully!', 'success');
+                })
+                .catch(err => {
+                    console.error('PDF Generation Error:', err);
+                    element.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+                    if (imgWasHidden && rptImg) { rptImg.style.display = ''; rptImg.src = originalSrc; }
+                    showAlert('Error generating PDF. Please try again.', 'danger');
+                });
+        }
+
+        // Clear Notes Function
+        function clearNotes() {
+            if (confirm('Are you sure you want to clear all notes?')) {
+                document.getElementById('doctorNotes').value = '';
+                document.getElementById('doctorApproval').checked = false;
+                const genBtn = document.getElementById('generateReportBtn');
+                if(genBtn) genBtn.disabled = true;
+                showAlert('Notes cleared.', 'info');
+            }
+        }
+
+        // Next Patient Function
+        function nextPatient() {
+            sessionStorage.removeItem('predicted_class');
+            sessionStorage.removeItem('confidence_percentage');
+            sessionStorage.removeItem('probabilities');
+            sessionStorage.removeItem('patientName');
+            sessionStorage.removeItem('patientId');
+            sessionStorage.removeItem('doctorAssessment');
+
+            showAlert('Moving to next patient...', 'info');
+            setTimeout(() => {
+                window.location.href = 'doctor-dashboard.html';
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Neuro Diagnosis</title>
+    <meta name="description" content="View your brain MRI scan analysis results">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/custom-style.css">
+    <link rel="stylesheet" href="css/animations.css">
+
+    <!-- html2pdf for direct downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Enhanced Styles for Demo -->
+    <style>
+        /* Smooth page entrance */
+        body {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Enhanced card hover effects */
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 166, 166, 0.2), 0 0 20px rgba(0, 166, 166, 0.15);
+        }
+
+        /* Image hover zoom effect */
+        .image-preview {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-preview img {
+            transition: transform 0.5s ease;
+        }
+
+        .image-preview:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Scanning effect overlay */
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(0, 166, 166, 0.8), transparent);
+            animation: scanLine 2s linear infinite;
+        }
+
+        /* Button ripple effect */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 166, 166, 0.3), 0 0 20px rgba(0, 166, 166, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="bi bi-brain text-primary fs-2 me-2"></i>
+                <span class="fw-bold text-primary fs-4">Neuro Diagnosis</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="container">
+            <!-- Patient Information Header - Animated Entrance -->
+            <div class="card border-0 shadow-sm mb-4 entrance-sequence-1"
+                style="background: linear-gradient(135deg, var(--nd-primary, #7BB661) 0%, var(--nd-primary-dark, #6BA055) 100%); color: white; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">
+                        <i class="bi bi-person-circle me-2"></i>Patient Information
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <small class="opacity-75">Patient Name</small>
+                            <p class="mb-0 fw-bold" id="patientName">-</p>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <small class="opacity-75">Patient ID</small>
+                            <p class="mb-0 fw-bold" id="patientId">-</p>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <small class="opacity-75">Age</small>
+                            <p class="mb-0 fw-bold" id="patientAge">-</p>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <small class="opacity-75">Gender</small>
+                            <p class="mb-0 fw-bold" id="patientGender">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Status Card - Dramatic Reveal -->
+            <div id="resultStatusCard" class="card border-0 shadow-sm mb-4 final-result-reveal">
+                <!-- Will be populated by JavaScript with dramatic animation -->
+            </div>
+
+            <!-- Two Column Layout - Scan and Analysis Side by Side -->
+            <div class="row g-4 mb-4">
+                <!-- Left Column - Original Scan -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100 entrance-sequence-2 nd-card">
+                        <div class="card-header border-bottom py-3" style="background: rgba(0, 166, 166, 0.05);">
+                            <h5 class="mb-0 fw-bold nd-text-primary">
+                                <i class="bi bi-file-earmark-medical me-2"></i>Your MRI Scan
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="image-preview scan-effect">
+                                <img id="originalScan" src="" alt="Original MRI Scan" class="img-fluid">
+                                <div class="scan-overlay"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Analysis Details -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm h-100 entrance-sequence-3 nd-card">
+                        <div class="card-header border-bottom py-3" style="background: rgba(0, 166, 166, 0.05);">
+                            <h5 class="mb-0 fw-bold nd-text-primary">
+                                <i class="bi bi-info-square me-2"></i>Analysis Details
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-6 stat-number-animate">
+                                    <p class="nd-text-secondary mb-1 small">Scan ID</p>
+                                    <p class="fw-bold mb-0 nd-text-primary" id="scanId">-</p>
+                                </div>
+                                <div class="col-6 stat-number-animate" style="animation-delay: 0.1s;">
+                                    <p class="nd-text-secondary mb-1 small">Analysis Date</p>
+                                    <p class="fw-bold mb-0 nd-text-primary" id="analysisDate">-</p>
+                                </div>
+                                <div class="col-6 stat-number-animate" style="animation-delay: 0.2s;">
+                                    <p class="nd-text-secondary mb-1 small">Model Confidence</p>
+                                    <p class="fw-bold mb-0 nd-text-primary" id="confidence">-</p>
+                                </div>
+                                <div class="col-6 stat-number-animate" style="animation-delay: 0.3s;">
+                                    <p class="nd-text-secondary mb-1 small">Processing Time</p>
+                                    <p class="fw-bold mb-0 nd-text-primary">2.3 seconds</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendation Box - Animated -->
+            <div id="recommendationBox" class="card border-0 shadow-sm mb-4 entrance-sequence-5">
+                <!-- Will be populated by JavaScript with smooth animation -->
+            </div>
+
+
+
+            <!-- Action Buttons - Enhanced with Hover Effects -->
+            <div class="text-center animate-fadeInUp" style="animation-delay: 1.2s; opacity: 0;">
+                <button class="btn nd-btn-primary btn-lg px-5 me-2" onclick="downloadReport()">
+                    <i class="bi bi-download me-2"></i>Download Report
+                </button>
+                <a href="patient-dashboard.html" class="btn btn-success btn-lg px-5 me-2">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload Another Scan
+                </a>
+                <a href="patient-dashboard.html" class="btn nd-btn-outline btn-lg px-5">
+                    <i class="bi bi-house me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Preview Modal (Hidden by default) -->
+    <div class="modal fade" id="reportPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content report-modal-content border-0">
+                <div class="modal-header border-bottom bg-white sticky-top">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-eye me-2"></i>Official Medical Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-light">
+                    <div id="reportContent" class="report-document shadow-sm">
+                        <!-- Professional Header -->
+                        <div class="report-header">
+                            <div class="report-branding">
+                                <h1 class="report-logo-text"><i class="bi bi-brain me-2"></i>NEURO DIAGNOSIS</h1>
+                                <p class="text-muted small mb-0">Medical Image Analysis & Diagnostics</p>
+                            </div>
+                            <div class="report-doc-title text-end">
+                                <h2 class="h5 fw-bold mb-0">OFFICIAL MEDICAL REPORT</h2>
+                                <p class="text-muted small mb-0">ID: <span id="rptCaseId">ND-998822</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 1: Patient Information -->
+                        <div class="report-section">
+                            <div class="report-section-title">Patient Information</div>
+                            <div class="report-meta-grid">
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient Name:</span>
+                                    <span class="report-value" id="rptPatientName">--</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Patient ID:</span>
+                                    <span class="report-value" id="rptPatientId">PT-2025-000</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Date of Birth:</span>
+                                    <span class="report-value">Aug 14, 1988 (35Y)</span>
+                                </div>
+                                <div class="report-meta-item">
+                                    <span class="report-label">Examination Date:</span>
+                                    <span class="report-value" id="rptScanDate">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Grid 2: Diagnostic Findings (Patient Version) -->
+                        <div class="report-section">
+                            <div class="report-section-title">Analysis Summary</div>
+                            <div class="report-results-content py-2">
+                                <div class="report-finding-box w-100 border-0 p-0 m-0">
+                                    <div id="rptAiBadge" class="report-ai-badge mb-2 d-inline-block">Completed</div>
+                                    <div class="mb-3">
+                                        <span class="report-label d-block text-muted small">Final Result:</span>
+                                        <span class="h5 fw-bold text-dark" id="rptAiFinding">--</span>
+                                    </div>
+                                    <p class="text-muted small mb-0">
+                                        <em>Please review the attending physician's assessment below for detailed guidance.</em>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Comments -->
+                        <div class="report-section">
+                            <div class="report-section-title">Physician Assessment</div>
+                            <div class="p-3 border rounded bg-light-subtle" id="rptDrNotes" 
+                                 style="min-height: 120px; white-space: pre-wrap; font-size: 0.95rem;">
+                                <!-- To be filled by assessment search -->
+                                Awaiting Clinical Physician Review.
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="report-signature-block" id="signatureBlock" style="display: none;">
+                            <div class="text-center">
+                                <p class="signature-font mb-0" id="rptDrSignature">Dr. Aliza</p>
+                                <div class="signature-line">
+                                    <strong id="rptDrName">Dr. Aliza</strong><br>
+                                    <span class="small text-muted">Attending Physician</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Footer -->
+                        <div class="mt-4 pt-3 border-top text-center text-muted small">
+                            Generated by Neuro Diagnosis v1.0 • Security Reference: ND-SEC-2025 • Page 1 of 1
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary px-4" id="btnConfirmDownload">
+                        <i class="bi bi-file-earmark-arrow-down me-2"></i>Download High-Definition PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="nd-footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-2">
+                        <strong class="nd-footer-brand">© 2025 Neuro Diagnosis</strong> | - FYP
+                    </p>
+                    <p class="mb-2">
+                        Powered by <strong>ResNet50 Transfer Learning</strong>
+                    </p>
+                    <p class="mb-0 small text-muted">
+                        <i class="bi bi-exclamation-circle me-1"></i>
+                        This is a demonstration system for educational purposes only.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script src="js/ui-feedback.js"></script>
+
+    <!-- Results Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Retrieve patient data — support both old and new key formats
+            const patientData = JSON.parse(sessionStorage.getItem('currentPatient') || '{}');
+            const uploadedImage = sessionStorage.getItem('uploadedImage');
+
+            // Retrieve REAL prediction data — use new standardized keys
+            const predictedClass = sessionStorage.getItem('predicted_class');
+            const confidence = sessionStorage.getItem('confidence_percentage');
+            const probabilities = sessionStorage.getItem('probabilities');
+
+            // Check if we have prediction data
+            if (!predictedClass || !confidence || !uploadedImage) {
+                showAlert('No prediction data found. Please upload and analyze a scan first.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'patient-upload.html';
+                }, 2000);
+                return;
+            }
+
+            // Display patient information — fallback to individual sessionStorage keys
+            const storedName = patientData.name || sessionStorage.getItem('patientName') || 'Patient';
+            const storedId   = patientData.patientId || sessionStorage.getItem('patientId') || 'N/A';
+            document.getElementById('patientName').textContent = storedName;
+            document.getElementById('patientId').textContent   = storedId;
+            document.getElementById('patientAge').textContent  = patientData.age ? patientData.age + ' years' : 'N/A';
+            document.getElementById('patientGender').textContent = patientData.gender || 'N/A';
+
+            // Display original scan
+            document.getElementById('originalScan').src = uploadedImage;
+
+            // Generate scan ID
+            const scanId = 'SCAN-2025-' + Math.floor(Math.random() * 9000 + 1000);
+            document.getElementById('scanId').textContent = scanId;
+
+            // Display current date and time
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('analysisDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+
+            // Display REAL confidence from backend
+            document.getElementById('confidence').textContent = confidence + '%';
+
+            // Display result based on REAL prediction
+            displayResult(predictedClass, confidence, probabilities);
+        });
+
+        function displayResult(predictedClass, confidence, probabilitiesJson) {
+            const resultCard = document.getElementById('resultStatusCard');
+            const recommendationBox = document.getElementById('recommendationBox');
+
+            // Parse probabilities
+            let probabilities = {};
+            try {
+                probabilities = JSON.parse(probabilitiesJson || '{}');
+            } catch (e) {
+                console.error('Error parsing probabilities:', e);
+            }
+
+            // Determine if tumor detected based on predicted class
+            const tumorDetected = predictedClass !== 'notumor' && predictedClass !== 'no_tumor';
+
+            // Map class names to display names (supports both Flask formats)
+            const classDisplayNames = {
+                'glioma': 'Glioma Tumor',
+                'glioma_tumor': 'Glioma Tumor',
+                'meningioma': 'Meningioma Tumor',
+                'meningioma_tumor': 'Meningioma Tumor',
+                'pituitary': 'Pituitary Tumor',
+                'pituitary_tumor': 'Pituitary Tumor',
+                'notumor': 'No Tumor',
+                'no_tumor': 'No Tumor'
+            };
+
+            const displayName = classDisplayNames[predictedClass] || predictedClass;
+
+            // Probabilities are always stored as decimals (0-1), multiply by 100 for display
+            const probMultiplier = 100;
+
+            if (tumorDetected) {
+                // Tumor detected result
+                resultCard.innerHTML = `
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); 
+box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4), 0 0 30px rgba(153, 27, 27, 0.2); 
+border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="text-white text-center">
+                            <i class="bi bi-exclamation-triangle-fill animate-scaleIn" style="font-size: 4rem; opacity: 0.9; animation-delay: 0.3s;"></i>
+                            <h2 class="fw-bold mt-3 mb-2 animate-fadeInUp" style="animation-delay: 0.5s;">Tumor Detected: ${displayName}</h2>
+                            <p class="mb-0 fs-5 animate-fadeInUp" style="animation-delay: 0.7s;">Our AI system has identified a potential ${displayName.toLowerCase()}</p>
+                            <p class="mb-0 mt-2 opacity-75 animate-fadeInUp" style="animation-delay: 0.9s;">Model Confidence: ${confidence}%</p>
+                        </div>
+                    </div>
+                `;
+
+                recommendationBox.innerHTML = `
+                    <div class="card-body p-4" style="background: #fff3cd; border-left: 4px solid #ff9800;">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-clipboard-pulse me-2"></i>Recommended Next Steps
+                        </h5>
+                        <ol class="mb-3">
+                            <li class="mb-2"><strong>Consult a Neurologist:</strong> Schedule an appointment with a qualified neurologist immediately for professional evaluation.</li>
+                            <li class="mb-2"><strong>Additional Tests:</strong> Your doctor may recommend further diagnostic tests such as contrast MRI, CT scan, or biopsy.</li>
+                            <li class="mb-2"><strong>Bring This Report:</strong> Download and bring this analysis report to your doctor's appointment.</li>
+                            <li class="mb-0"><strong>Don't Panic:</strong> Early detection improves treatment outcomes. Follow your doctor's guidance.</li>
+                        </ol>
+                        <h6 class="fw-bold mt-3 mb-2">All Probabilities:</h6>
+                        <ul class="mb-0">
+                            ${Object.entries(probabilities).map(([className, prob]) =>
+                    `<li><strong>${classDisplayNames[className] || className}:</strong> ${(prob * probMultiplier).toFixed(2)}%</li>`
+                ).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                // No tumor detected result
+                resultCard.innerHTML = `
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #10b981 0%, #065f46 100%); 
+box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4), 0 0 30px rgba(6, 95, 70, 0.2); 
+border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="text-white text-center">
+                            <i class="bi bi-check-circle-fill result-clear-animation" style="font-size: 4rem; opacity: 0.9;"></i>
+                            <h2 class="fw-bold mt-3 mb-2 animate-fadeInUp" style="animation-delay: 0.5s;">No Tumor Detected</h2>
+                            <p class="mb-0 fs-5 animate-fadeInUp" style="animation-delay: 0.7s;">Our AI system did not identify any tumor in your scan</p>
+                            <p class="mb-0 mt-2 opacity-75 animate-fadeInUp" style="animation-delay: 0.9s;">Model Confidence: ${confidence}%</p>
+                        </div>
+                    </div>
+                `;
+
+                recommendationBox.innerHTML = `
+                    <div class="card-body p-4" style="background: #d1f2eb; border-left: 4px solid #4caf50;">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-clipboard-check me-2"></i>Recommended Next Steps
+                        </h5>
+                        <ol class="mb-3">
+                            <li class="mb-2"><strong>Routine Follow-up:</strong> Schedule a routine follow-up with your doctor to discuss the results.</li>
+                            <li class="mb-2"><strong>Maintain Records:</strong> Keep this report for your medical records.</li>
+                            <li class="mb-2"><strong>Regular Screening:</strong> Continue with regular health check-ups as recommended by your doctor.</li>
+                            <li class="mb-0"><strong>Healthy Lifestyle:</strong> Maintain a healthy lifestyle and report any new symptoms to your doctor.</li>
+                        </ol>
+                        <h6 class="fw-bold mt-3 mb-2">All Probabilities:</h6>
+                        <ul class="mb-0">
+                            ${Object.entries(probabilities).map(([className, prob]) =>
+                    `<li><strong>${classDisplayNames[className] || className}:</strong> ${(prob * probMultiplier).toFixed(2)}%</li>`
+                ).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function downloadReport() {
+            // Retrieve data for the report
+            const patientData = JSON.parse(sessionStorage.getItem('currentPatient') || '{}');
+            const predictedClass = sessionStorage.getItem('predicted_class') || 'Not Analyzed';
+            const confidence = sessionStorage.getItem('confidence_percentage') || '0';
+            const uploadedImage = sessionStorage.getItem('uploadedImage');
+            const storedName = patientData.name || sessionStorage.getItem('patientName') || 'Patient';
+            const storedId   = patientData.patientId || sessionStorage.getItem('patientId') || 'PT-TEMP';
+            
+            // Map AI labels
+            const classDisplayNames = {
+                'glioma': 'Glioma Tumor', 'glioma_tumor': 'Glioma Tumor',
+                'meningioma': 'Meningioma Tumor', 'meningioma_tumor': 'Meningioma Tumor',
+                'pituitary': 'Pituitary Tumor', 'pituitary_tumor': 'Pituitary Tumor',
+                'notumor': 'No Tumor', 'no_tumor': 'No Tumor'
+            };
+            const displayName = classDisplayNames[predictedClass] || predictedClass;
+            const tumorDetected = predictedClass !== 'notumor' && predictedClass !== 'no_tumor';
+
+            // Populate Modal
+            document.getElementById('rptCaseId').textContent = 'ND-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('rptPatientName').textContent = storedName;
+            document.getElementById('rptPatientId').textContent = storedId;
+            document.getElementById('rptScanDate').textContent = new Date().toLocaleDateString();
+            
+            const badge = document.getElementById('rptAiBadge');
+            if (badge) {
+                badge.textContent = 'Clinical Review Complete';
+                badge.className = 'report-ai-badge ' + (tumorDetected ? 'report-ai-detected' : 'report-ai-clear');
+                if (!tumorDetected) {
+                    badge.style.background = '#e8f5e9';
+                    badge.style.color = '#2e7d32';
+                }
+            }
+            
+            // Patient-friendly display result name
+            const patientFriendlyName = tumorDetected 
+                ? 'Abnormality detected. Consultation with attending physician is scheduled.' 
+                : 'No abnormalities detected. Scan appears normal.';
+            
+            if (document.getElementById('rptAiFinding')) {
+                document.getElementById('rptAiFinding').textContent = patientFriendlyName;
+            }
+            if (document.getElementById('rptAiConfidence')) {
+                document.getElementById('rptAiConfidence').textContent = confidence + '%';
+            }
+            if (document.getElementById('rptImg')) {
+                document.getElementById('rptImg').src = uploadedImage || 'images/heatmap-sample.jpg';
+            }
+
+            // Check for Doctor Assessment
+            const assessment = JSON.parse(sessionStorage.getItem('doctorAssessment') || 'null');
+            if (assessment) {
+                document.getElementById('rptDrNotes').textContent = assessment.notes;
+                document.getElementById('rptDrName').textContent = assessment.doctorName;
+                document.getElementById('rptDrSignature').textContent = assessment.doctorName;
+                document.getElementById('signatureBlock').style.display = 'block';
+            } else {
+                document.getElementById('rptDrNotes').textContent = "Awaiting final clinical review by a certified physician. This AI analysis is preliminary.";
+                document.getElementById('signatureBlock').style.display = 'none';
+            }
+
+            // Show and handle download
+            const reportModal = new bootstrap.Modal(document.getElementById('reportPreviewModal'));
+            reportModal.show();
+
+            document.getElementById('btnConfirmDownload').onclick = function() {
+                executePDFDownload();
+            };
+        }
+
+        function executePDFDownload() {
+            const element   = document.getElementById('reportContent');
+            const patientId = document.getElementById('rptPatientId').textContent;
+            const rptImg    = document.getElementById('rptImg');
+
+            // ─── Fix: Tainted Canvas (SecurityError on file:// protocol) ───────────────
+            const storedImage = sessionStorage.getItem('uploadedImage');
+            const originalSrc = rptImg ? rptImg.src : '';
+            let imgWasHidden  = false;
+
+            if (rptImg) {
+                if (storedImage && storedImage.startsWith('data:')) {
+                    rptImg.src = storedImage;          // ✅ use stored base64
+                } else if (rptImg.src.startsWith('data:')) {
+                    // Already base64 — nothing to do ✅
+                } else {
+                    // Local path — hide to prevent canvas taint
+                    rptImg.style.display = 'none';
+                    imgWasHidden = true;
+                }
+            }
+            // ────────────────────────────────────────────────────────────────────────────
+
+            element.style.boxShadow = 'none';
+            element.style.border    = 'none';
+
+            const opt = {
+                margin:      [10, 10, 10, 10],
+                filename:    `Neuro_Diagnostic_Report_${patientId}.pdf`,
+                image:       { type: 'jpeg', quality: 1.0 },
+                html2canvas: {
+                    scale:           3,
+                    useCORS:         true,
+                    allowTaint:      false,
+                    letterRendering: true,
+                    logging:         false,
+                    scrollY:         0,
+                    scrollX:         0
+                },
+                jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            showAlert('Generating official report...', 'info');
+
+            html2pdf().set(opt).from(element).save()
+                .then(() => {
+                    element.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+                    if (imgWasHidden && rptImg) { rptImg.style.display = ''; rptImg.src = originalSrc; }
+                    showAlert('Report downloaded successfully!', 'success');
+                })
+                .catch(err => {
+                    console.error('PDF Error:', err);
+                    element.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+                    if (imgWasHidden && rptImg) { rptImg.style.display = ''; rptImg.src = originalSrc; }
+                    showAlert('Error generating PDF.', 'danger');
+                });
+        }
+
+    </script>
+</body>
+
+</html>

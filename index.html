@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuro Diagnosis - Brain Tumor Detection</title>
+    <meta name="description" content="Advanced brain tumor detection system for patients and medical professionals">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="bi bi-brain text-primary fs-2 me-2"></i>
+                <span class="fw-bold text-primary fs-4">Neuro Diagnosis</span>
+            </a>
+            <div class="ms-auto">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill border border-primary"><i class="bi bi-shield-check me-1"></i> Secure Portal</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center min-vh-100 align-items-center py-5">
+                <div class="col-12 col-md-8 col-lg-5">
+                    
+                    <div class="text-center mb-4">
+                        <h1 class="display-4 fw-bold text-primary mb-3" style="letter-spacing: -1px;">
+                            <i class="bi bi-brain me-2"></i>Neuro Diagnosis
+                        </h1>
+                        <p class="lead text-muted">
+                            Advanced AI Brain Tumor Detection System
+                        </p>
+                    </div>
+
+                    <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+                                <p class="text-muted small">Sign in to access your portal</p>
+                            </div>
+                            
+                            <!-- Unified Login Form -->
+                            <form id="loginForm" action="/login" method="POST">
+                                <div class="form-floating mb-4">
+                                    <input type="email" class="form-control" id="floatingEmail" name="email" placeholder="name@example.com" required style="border-radius: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                    <label for="floatingEmail" class="text-muted"><i class="bi bi-envelope me-2"></i>Email address</label>
+                                </div>
+                                <div class="form-floating mb-4">
+                                    <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required style="border-radius: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                    <label for="floatingPassword" class="text-muted"><i class="bi bi-lock me-2"></i>Password</label>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input shadow-sm" type="checkbox" value="" id="rememberMe">
+                                        <label class="form-check-label text-muted small" for="rememberMe">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <a href="#" class="text-primary small text-decoration-none fw-semibold">Forgot password?</a>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none; font-size: 1.1rem; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(13,110,253,0.3)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 .5rem 1rem rgba(0,0,0,.15)';">
+                                    Sign In <i class="bi bi-arrow-right-circle ms-2"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="card-footer bg-light border-0 text-center py-3 rounded-bottom-4">
+                            <p class="mb-0 small text-muted">Need system access? <a href="#" class="text-primary fw-semibold text-decoration-none">Contact IT Support</a></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col">
+                    <h2 class="fw-bold text-primary mb-3">Why Choose Neuro Diagnosis?</h2>
+                    <p class="text-muted">Advanced technology for better healthcare outcomes</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-lightning-charge-fill text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold mb-3">Fast Results</h5>
+                            <p class="card-text text-muted">
+                                Get accurate diagnosis results in minutes, not days. Our AI-powered system processes
+                                scans rapidly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-shield-fill-check text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold mb-3">High Accuracy</h5>
+                            <p class="card-text text-muted">
+                                Advanced deep learning models trained on thousands of medical images for precise
+                                detection.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-lock-fill text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold mb-3">Secure & Private</h5>
+                            <p class="card-text text-muted">
+                                Your medical data is encrypted and protected with industry-standard security protocols.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Neuro Diagnosis. All rights reserved.</p>
+            <div class="mt-2 mb-2">
+               <!--- <a href="admin-login.html" class="text-white text-decoration-none opacity-75 small hover-opacity-100">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Admin Access
+                </a>*/
+                -->
+            </div>
+            <p class="mb-0 small mt-2">For educational and demonstration purposes only</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+    <!-- Unified Form Login Controller -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const emailInput = document.getElementById('floatingEmail');
+            const passwordInput = document.getElementById('floatingPassword');
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Clear any previous alerts
+            const existingAlerts = document.querySelectorAll('.alert-dismissible');
+            existingAlerts.forEach(alert => alert.remove());
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Authenticating...';
+
+            try {
+                // Try sending to the Flask backend
+                const response = await fetch('http://localhost:5000/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    // Store the session details using the main JS utility
+                    setUserSession(result.role, result.user_data);
+
+                    if (window.showAlert) {
+                        showAlert('Authentication successful! Redirecting...', 'success');
+                    } else {
+                        alert('Authentication successful! Redirecting...');
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = result.redirect_url;
+                    }, 1000);
+                } else {
+                    // Show error from backend
+                    throw new Error(result.error || 'Invalid credentials');
+                }
+
+            } catch (error) {
+                console.warn('Backend login failed or unreachable, running mock authentication:', error);
+
+                // Graceful fallback for mock presentation / demo mode
+                const emailLower = email.toLowerCase();
+                const username = email.split('@')[0].toLowerCase();
+                
+                const isAdmin = emailLower.includes('admin');
+                const isDocOrRad = (
+                    emailLower.includes('doctor') ||
+                    emailLower.includes('dr.') ||
+                    emailLower.includes('radiologist') ||
+                    emailLower.includes('rad') ||
+                    emailLower.endsWith('.hospital.com') ||
+                    emailLower.endsWith('@neuro') ||
+                    username.endsWith('dr') ||
+                    username.endsWith('rad')
+                );
+
+                let role = 'patient';
+                let redirectUrl = 'patient-dashboard.html';
+                let userData = {};
+
+                if (isAdmin) {
+                    if (password === 'Admin@12') {
+                        role = 'admin';
+                        redirectUrl = 'admin-dashboard.html';
+                        
+                        let cleanName = username.replace('admin', '').replace(/\./g, ' ').replace(/-/g, ' ').replace(/_/g, ' ').trim();
+                        let name = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                        if (["Akiza", "Akizadr", "Alizadr"].includes(name)) {
+                            name = "Aliza";
+                        }
+                        if (!name) {
+                            name = "System";
+                        }
+                        
+                        userData = {
+                            name: name + ' Admin',
+                            email: email,
+                            role: 'Administrator',
+                            id: 'ADM-001'
+                        };
+                    } else {
+                        if (window.showAlert) {
+                            showAlert('Invalid Admin credentials. Use password Admin@12', 'danger');
+                        } else {
+                            alert('Invalid Admin credentials. Use password Admin@12');
+                        }
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                        return;
+                    }
+                } else if (isDocOrRad) {
+                    role = 'doctor';
+                    const status = emailLower.includes('pending') ? 'pending' : 'active';
+                    redirectUrl = status === 'pending' ? 'doctor-pending.html' : 'doctor-dashboard.html';
+                    
+                    let cleanName = username;
+                    ['dr.', 'dr', 'doctor', 'radiologist', 'rad'].forEach(term => {
+                        if (cleanName.startsWith(term)) cleanName = cleanName.slice(term.length);
+                        if (cleanName.endsWith(term)) cleanName = cleanName.slice(0, -term.length);
+                        const escapedTerm = term.replace('.', '\\.');
+                        cleanName = cleanName.replace(new RegExp('\\.' + escapedTerm, 'g'), '')
+                                             .replace(new RegExp(escapedTerm + '\\.', 'g'), '')
+                                             .replace(new RegExp(escapedTerm, 'g'), '');
+                    });
+                    
+                    cleanName = cleanName.replace(/\./g, ' ').replace(/-/g, ' ').replace(/_/g, ' ').trim();
+                    let name = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                    if (["Akiza", "Akizadr", "Alizadr"].includes(name)) {
+                        name = "Aliza";
+                    }
+                    if (!name) {
+                        name = "Aliza";
+                    }
+                    
+                    const isRadiologist = emailLower.includes('radiologist') || emailLower.includes('rad') || username.endsWith('rad');
+                    const displayName = isRadiologist ? `Dr. ${name} (Radiologist)` : `Dr. ${name}`;
+                    
+                    userData = {
+                        name: displayName,
+                        email: email,
+                        licenseNumber: 'LIC-98243',
+                        status: status,
+                        id: 'DR-' + Math.floor(Math.random() * 10000)
+                    };
+                } else {
+                    role = 'patient';
+                    redirectUrl = 'patient-dashboard.html';
+                    
+                    let cleanName = username.replace(/\./g, ' ').replace(/-/g, ' ').replace(/_/g, ' ').trim();
+                    let name = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                    if (["Akiza", "Akizadr", "Alizadr"].includes(name)) {
+                        name = "Irfan Ahmed";
+                    }
+                    if (!name) {
+                        name = "John Doe";
+                    }
+                    
+                    userData = {
+                        name: name,
+                        email: email,
+                        id: 'PT-' + Math.floor(Math.random() * 10000)
+                    };
+                }
+
+                // Store mock session
+                setUserSession(role, userData);
+
+                if (window.showAlert) {
+                    showAlert('Authentication successful! Redirecting to dashboard...', 'success');
+                } else {
+                    alert('Authentication successful! Redirecting to dashboard...');
+                }
+
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>

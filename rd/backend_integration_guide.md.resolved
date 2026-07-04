@@ -1,0 +1,447 @@
+# Flask Backend Integration Guide
+
+This guide contains all the JavaScript updates needed to integrate your frontend with the Flask backend API.
+
+---
+
+## 📋 Overview
+
+Your Flask backend is running at `http://localhost:5000` with these endpoints:
+- **POST** `/api/predict` - Returns tumor prediction
+- **GET** `/api/health` - Health check
+
+The backend returns JSON like:
+```json
+{
+  "success": true,
+  "predicted_class": "glioma",
+  "confidence_percentage": 92.41,
+  "all_probabilities": {
+    "glioma": 92.41,
+    "meningioma": 5.23,
+    "pituitary": 1.89,
+    "notumor": 0.47
+  }
+}
+```
+
+---
+
+## 🔧 Implementation Changes
+
+### 1. Update [patient-upload.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-upload.html)
+
+**Location:** Lines 292-308 (inside the existing `<script>` tag)
+
+**Replace the existing "Analyze scan" button click handler** (lines 293-308) with:
+
+```javascript
+// Analyze scan - UPDATED TO USE REAL BACKEND
+analyzeBtn.addEventListener('click', async function () {
+    if (!uploadedFile) return;
+
+    // Hide upload area and show loading
+    uploadArea.style.display = 'none';
+    previewArea.classList.add('d-none');
+    analyzeBtn.classList.add('d-none');
+    clearBtn.classList.add('d-none');
+    loadingOverlay.classList.remove('d-none');
+
+    try {
+        // Create FormData and append the image file
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+
+        // Send POST request to Flask backend
+        const response = await fetch('http://localhost:5000/api/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Store prediction results in sessionStorage
+            sessionStorage.setItem('predictedClass', result.predicted_class);
+            sessionStorage.setItem('confidence', result.confidence_percentage.toFixed(2));
+            sessionStorage.setItem('probabilities', JSON.stringify(result.all_probabilities));
+            
+            // uploadedImage is already stored in handleFile function (line 268)
+            // Redirect to results page after short delay
+            setTimeout(function () {
+                window.location.href = 'patient-results-new.html';
+            }, 500);
+        } else {
+            throw new Error('Prediction failed: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error during prediction:', error);
+        
+        // Hide loading overlay
+        loadingOverlay.classList.add('d-none');
+        
+        // Show upload area again
+        uploadArea.style.display = '';
+        previewArea.classList.remove('d-none');
+        analyzeBtn.classList.remove('d-none');
+        clearBtn.classList.remove('d-none');
+        
+        // Show error message
+        showAlert('Failed to analyze scan. Please ensure the backend server is running at http://localhost:5000 and try again. Error: ' + error.message, 'danger');
+    }
+});
+```
+
+---
+
+### 2. Update [patient-results-new.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-results-new.html)
+
+**Location:** Lines 256-361 (replace the entire `<script>` section)
+
+**Replace the entire script section** with:
+
+```javascript
+document.addEventListener('DOMContentLoaded', function () {
+    // Retrieve patient data
+    const patientData = JSON.parse(sessionStorage.getItem('currentPatient') || '{}');
+    const uploadedImage = sessionStorage.getItem('uploadedImage');
+    
+    // Retrieve REAL prediction data from backend
+    const predictedClass = sessionStorage.getItem('predictedClass');
+    const confidence = sessionStorage.getItem('confidence');
+    const probabilities = sessionStorage.getItem('probabilities');
+
+    // Check if we have prediction data
+    if (!predictedClass || !confidence || !uploadedImage) {
+        showAlert('No prediction data found. Please upload and analyze a scan first.', 'warning');
+        setTimeout(() => {
+            window.location.href = 'patient-upload.html';
+        }, 2000);
+        return;
+    }
+
+    // Display patient information (if available)
+    if (patientData.name) {
+        document.getElementById('patientName').textContent = patientData.name;
+        document.getElementById('patientId').textContent = patientData.patientId || 'N/A';
+        document.getElementById('patientAge').textContent = (patientData.age ? patientData.age + ' years' : 'N/A');
+        document.getElementById('patientGender').textContent = patientData.gender || 'N/A';
+    } else {
+        // Use placeholder if no patient data
+        document.getElementById('patientName').textContent = 'Patient';
+        document.getElementById('patientId').textContent = 'N/A';
+        document.getElementById('patientAge').textContent = 'N/A';
+        document.getElementById('patientGender').textContent = 'N/A';
+    }
+
+    // Display original scan
+    document.getElementById('originalScan').src = uploadedImage;
+
+    // Generate scan ID
+    const scanId = 'SCAN-2025-' + Math.floor(Math.random() * 9000 + 1000);
+    document.getElementById('scanId').textContent = scanId;
+
+    // Display current date and time
+    const now = new Date();
+    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('analysisDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+
+    // Display REAL confidence from backend
+    document.getElementById('confidence').textContent = confidence + '%';
+
+    // Display result based on REAL prediction
+    displayResult(predictedClass, confidence, probabilities);
+});
+
+function displayResult(predictedClass, confidence, probabilitiesJson) {
+    const resultCard = document.getElementById('resultStatusCard');
+    const recommendationBox = document.getElementById('recommendationBox');
+    
+    // Parse probabilities
+    let probabilities = {};
+    try {
+        probabilities = JSON.parse(probabilitiesJson || '{}');
+    } catch (e) {
+        console.error('Error parsing probabilities:', e);
+    }
+
+    // Determine if tumor detected based on predicted class
+    const tumorDetected = predictedClass !== 'notumor';
+    
+    // Map class names to display names
+    const classDisplayNames = {
+        'glioma': 'Glioma Tumor',
+        'meningioma': 'Meningioma Tumor',
+        'pituitary': 'Pituitary Tumor',
+        'notumor': 'No Tumor'
+    };
+    
+    const displayName = classDisplayNames[predictedClass] || predictedClass;
+
+    if (tumorDetected) {
+        // Tumor detected result
+        resultCard.innerHTML = `
+            <div class="card-body p-4" style="background: linear-gradient(135deg, #EED987 0%, #8A6E45 100%); 
+box-shadow: 0 8px 24px rgba(238, 217, 135, 0.3), 0 0 30px rgba(138, 110, 69, 0.2); 
+border: 1px solid rgba(138, 110, 69, 0.5);">
+                <div class="text-white text-center">
+                    <i class="bi bi-exclamation-triangle-fill animate-scaleIn" style="font-size: 4rem; opacity: 0.9; animation-delay: 0.3s;"></i>
+                    <h2 class="fw-bold mt-3 mb-2 animate-fadeInUp" style="animation-delay: 0.5s;">Tumor Detected: ${displayName}</h2>
+                    <p class="mb-0 fs-5 animate-fadeInUp" style="animation-delay: 0.7s;">Our AI system has identified a potential ${displayName.toLowerCase()}</p>
+                    <p class="mb-0 mt-2 opacity-75 animate-fadeInUp" style="animation-delay: 0.9s;">Model Confidence: ${confidence}%</p>
+                </div>
+            </div>
+        `;
+
+        recommendationBox.innerHTML = `
+            <div class="card-body p-4" style="background: #fff3cd; border-left: 4px solid #ff9800;">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-clipboard-pulse me-2"></i>Recommended Next Steps
+                </h5>
+                <ol class="mb-3">
+                    <li class="mb-2"><strong>Consult a Neurologist:</strong> Schedule an appointment with a qualified neurologist immediately for professional evaluation.</li>
+                    <li class="mb-2"><strong>Additional Tests:</strong> Your doctor may recommend further diagnostic tests such as contrast MRI, CT scan, or biopsy.</li>
+                    <li class="mb-2"><strong>Bring This Report:</strong> Download and bring this analysis report to your doctor's appointment.</li>
+                    <li class="mb-0"><strong>Don't Panic:</strong> Early detection improves treatment outcomes. Follow your doctor's guidance.</li>
+                </ol>
+                <h6 class="fw-bold mt-3 mb-2">All Probabilities:</h6>
+                <ul class="mb-0">
+                    ${Object.entries(probabilities).map(([className, prob]) => 
+                        `<li><strong>${classDisplayNames[className] || className}:</strong> ${prob.toFixed(2)}%</li>`
+                    ).join('')}
+                </ul>
+            </div>
+        `;
+    } else {
+        // No tumor detected result
+        resultCard.innerHTML = `
+            <div class="card-body p-4" style="background: linear-gradient(135deg, #FAFAF7 0%, #8A6E45 100%); 
+box-shadow: 0 8px 24px rgba(138, 110, 69, 0.2), 0 0 30px rgba(138, 110, 69, 0.1); 
+border: 1px solid rgba(138, 110, 69, 0.3);">
+                <div class="text-white text-center">
+                    <i class="bi bi-check-circle-fill result-clear-animation" style="font-size: 4rem; opacity: 0.9;"></i>
+                    <h2 class="fw-bold mt-3 mb-2 animate-fadeInUp" style="animation-delay: 0.5s;">No Tumor Detected</h2>
+                    <p class="mb-0 fs-5 animate-fadeInUp" style="animation-delay: 0.7s;">Our AI system did not identify any tumor in your scan</p>
+                    <p class="mb-0 mt-2 opacity-75 animate-fadeInUp" style="animation-delay: 0.9s;">Model Confidence: ${confidence}%</p>
+                </div>
+            </div>
+        `;
+
+        recommendationBox.innerHTML = `
+            <div class="card-body p-4" style="background: #d1f2eb; border-left: 4px solid #4caf50;">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-clipboard-check me-2"></i>Recommended Next Steps
+                </h5>
+                <ol class="mb-3">
+                    <li class="mb-2"><strong>Routine Follow-up:</strong> Schedule a routine follow-up with your doctor to discuss the results.</li>
+                    <li class="mb-2"><strong>Maintain Records:</strong> Keep this report for your medical records.</li>
+                    <li class="mb-2"><strong>Regular Screening:</strong> Continue with regular health check-ups as recommended by your doctor.</li>
+                    <li class="mb-0"><strong>Healthy Lifestyle:</strong> Maintain a healthy lifestyle and report any new symptoms to your doctor.</li>
+                </ol>
+                <h6 class="fw-bold mt-3 mb-2">All Probabilities:</h6>
+                <ul class="mb-0">
+                    ${Object.entries(probabilities).map(([className, prob]) => 
+                        `<li><strong>${classDisplayNames[className] || className}:</strong> ${prob.toFixed(2)}%</li>`
+                    ).join('')}
+                </ul>
+            </div>
+        `;
+    }
+}
+
+function downloadReport() {
+    showAlert('Report download feature - demo only. In production, this would generate a detailed PDF report.', 'info');
+}
+```
+
+---
+
+### 3. Update [doctor-review.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/doctor-review.html)
+
+**Location:** Lines 303-343 (inside the [loadScanDetails](file:///c:/Users/PMLS/Desktop/ui%20ph1/doctor-review.html#303-344) function)
+
+**Replace the [loadScanDetails](file:///c:/Users/PMLS/Desktop/ui%20ph1/doctor-review.html#303-344) function** (lines 304-343) with:
+
+```javascript
+// Function to load and populate all data
+function loadScanDetails(scanId) {
+    // Load REAL prediction data from sessionStorage
+    const predictedClass = sessionStorage.getItem('predictedClass');
+    const confidence = sessionStorage.getItem('confidence');
+    const probabilities = sessionStorage.getItem('probabilities');
+    const uploadedImage = sessionStorage.getItem('uploadedImage');
+    
+    // Also load doctor scan data if available
+    const doctorScans = JSON.parse(sessionStorage.getItem('doctorScans') || '[]');
+    const scanData = doctorScans.length > 0 ? doctorScans[doctorScans.length - 1] : null;
+
+    // Populate Patient Information
+    if (scanData) {
+        document.querySelectorAll('.card-body p.fw-bold')[0].textContent = scanData.patientName || 'Ahmad Khan';
+        document.querySelectorAll('.card-body p.fw-bold')[1].textContent = scanData.patientId || 'PT-2025-456';
+        document.querySelectorAll('.card-body p.fw-bold')[2].textContent = scanData.age ? `${scanData.age} years` : '45 years';
+        
+        const uploadDate = scanData.uploadDate ? new Date(scanData.uploadDate) : new Date();
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.querySelectorAll('.card-body p.fw-bold')[3].textContent = uploadDate.toLocaleDateString('en-US', dateOptions);
+    }
+
+    // Populate the uploaded scan image - REAL IMAGE
+    if (uploadedImage) {
+        document.getElementById('originalMRI').src = uploadedImage;
+    } else if (scanData && scanData.scanImage) {
+        document.getElementById('originalMRI').src = scanData.scanImage;
+    } else {
+        console.warn('No scan image found in sessionStorage');
+        document.getElementById('originalMRI').src = 'images/heatmap-sample.jpg'; // Fallback
+    }
+
+    // Update Analysis Date/Time
+    const now = new Date();
+    const dateTimeOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('analysisDateTime').textContent = now.toLocaleDateString('en-US', dateTimeOptions);
+
+    // Display REAL prediction results
+    if (predictedClass && confidence) {
+        // Map class names to display names
+        const classDisplayNames = {
+            'glioma': 'Glioma Tumor',
+            'meningioma': 'Meningioma Tumor',
+            'pituitary': 'Pituitary Tumor',
+            'notumor': 'No Tumor'
+        };
+        
+        const displayName = classDisplayNames[predictedClass] || predictedClass;
+        const tumorDetected = predictedClass !== 'notumor';
+        
+        // Update the classification result card
+        const classificationCard = document.querySelector('.text-center.mb-4.p-4');
+        if (classificationCard) {
+            if (tumorDetected) {
+                classificationCard.style.background = 'linear-gradient(135deg, #ff9800 0%, #ff6f00 100%)';
+                classificationCard.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill text-white" style="font-size: 3rem;"></i>
+                    <h3 class="text-white fw-bold mt-2 mb-0">Tumor Detected: ${displayName}</h3>
+                `;
+            } else {
+                classificationCard.style.background = 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)';
+                classificationCard.innerHTML = `
+                    <i class="bi bi-check-circle-fill text-white" style="font-size: 3rem;"></i>
+                    <h3 class="text-white fw-bold mt-2 mb-0">No Tumor Detected</h3>
+                `;
+            }
+        }
+        
+        // Update confidence display
+        const confidenceElement = document.querySelector('.col-md-6 .p-3.bg-light.rounded h4');
+        if (confidenceElement) {
+            confidenceElement.textContent = confidence + '%';
+        }
+        
+        // Update probabilities table if available
+        if (probabilities) {
+            try {
+                const probs = JSON.parse(probabilities);
+                const tableBody = document.querySelector('.table tbody');
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td class="fw-semibold">Glioma</td>
+                            <td class="text-end"><span class="badge bg-primary">${probs.glioma ? probs.glioma.toFixed(2) : '0.00'}%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold">Meningioma</td>
+                            <td class="text-end"><span class="badge bg-info">${probs.meningioma ? probs.meningioma.toFixed(2) : '0.00'}%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold">Pituitary</td>
+                            <td class="text-end"><span class="badge bg-warning">${probs.pituitary ? probs.pituitary.toFixed(2) : '0.00'}%</span></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold">No Tumor</td>
+                            <td class="text-end"><span class="badge bg-success">${probs.notumor ? probs.notumor.toFixed(2) : '0.00'}%</span></td>
+                        </tr>
+                    `;
+                }
+            } catch (e) {
+                console.error('Error parsing probabilities:', e);
+            }
+        }
+    } else {
+        console.warn('No prediction data found in sessionStorage, using default values');
+    }
+}
+```
+
+---
+
+## ✅ Testing Checklist
+
+After making these changes:
+
+1. **Start Flask Backend**
+   ```bash
+   python app.py  # or whatever your Flask file is named
+   ```
+   Ensure it's running on `http://localhost:5000`
+
+2. **Test the Flow**
+   - Open [patient-upload.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-upload.html)
+   - Upload an MRI image
+   - Click "Analyze Scan"
+   - Verify it sends request to backend
+   - Check that you're redirected to [patient-results-new.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-results-new.html)
+   - Verify real prediction data is displayed
+
+3. **Check Console**
+   - Open browser DevTools (F12)
+   - Look for any errors in Console
+   - Check Network tab to see API requests
+
+4. **Verify Data Flow**
+   - Check sessionStorage in DevTools > Application > Session Storage
+   - Should see: `predictedClass`, `confidence`, `probabilities`, `uploadedImage`
+
+---
+
+## 🔍 CORS Configuration
+
+If you encounter CORS errors, ensure your Flask backend has CORS enabled:
+
+```python
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+```
+
+Or for specific routes:
+```python
+@app.route('/api/predict', methods=['POST'])
+def predict():
+    # ... your code
+    response = jsonify(result)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+```
+
+---
+
+## 📝 Summary of Changes
+
+| File | Lines Changed | What Changed |
+|------|---------------|--------------|
+| [patient-upload.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-upload.html) | 293-308 | Added async/await fetch to POST image to `/api/predict`, store results in sessionStorage |
+| [patient-results-new.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/patient-results-new.html) | 256-361 | Read real prediction from sessionStorage, display actual tumor type and confidence |
+| [doctor-review.html](file:///c:/Users/PMLS/Desktop/ui%20ph1/doctor-review.html) | 304-343 | Load real prediction data, update UI with actual results and probabilities |
+
+**Key Points:**
+- ✅ No more random/dummy data
+- ✅ Real predictions from ResNet50 model
+- ✅ Proper error handling with user feedback
+- ✅ All data flows through sessionStorage
+- ✅ UI unchanged, only data source changed
