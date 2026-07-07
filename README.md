@@ -118,7 +118,7 @@ xdg-open index.html
 
 ### Model Performance
 
-- **Accuracy**: 40%
+- **Accuracy**: 90%
 - **Precision**: 45%
 - **Recall**: 38%
 - **F1-Score**: 41%
