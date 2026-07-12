@@ -487,12 +487,11 @@
             const session = getUserSession();
             
             // Uncomment in production
-            /*
+            
             if (!session.userType || session.userType !== 'admin') {
-                window.location.href = 'admin-login.html';
+                window.location.href = 'index.html';
                 return;
             }
-            */
             
             loadSettings();
             renderAdminDashboard();
